@@ -164,6 +164,7 @@ def generate_leg_commands(
     drop_zone: Optional[str] = None,
     forward_speed: Optional[int] = None,
     turning_speed: Optional[int] = None,
+    stop_operations: Optional[Dict[str, str]] = None,
 ) -> Tuple[List[Tuple], str]:
     """
     Generate path commands for a single leg without writing to file.
@@ -211,6 +212,7 @@ def generate_leg_commands(
         zone_alignment=zone_alignment,
         selected_racks_by_stop=None,
         drop_zone=drop_zone,
+        stop_operations=stop_operations,
     )
 
     # Determine final direction from last edge if possible
@@ -239,6 +241,10 @@ def plan_and_write_path(
     selected_stop_ids: Optional[List[str]] = None,
     selected_rack_ids: Optional[List[str]] = None,
     drop_zone: Optional[str] = None,
+    end_zone: Optional[str] = None,
+    pickup_stops: Optional[List[str]] = None,
+    check_stops: Optional[List[str]] = None,
+    drop_stops: Optional[List[str]] = None,
 ) -> str:
     """
     Generate path commands and write to data/device_logs/path_{device_id}.csv.
@@ -303,6 +309,7 @@ def plan_and_write_path(
     # filter stops to only those stop_id values. This ensures the path
     # planner visits exactly the requested logical stops while other
     # task types (Auditing/Storing) continue to use all stops.
+    # For picking tasks with pickup/check/drop stops, include all of them
     allowed_stops: Dict[str, bool] = {}
     if selected_stop_ids:
         for s in selected_stop_ids:
@@ -316,6 +323,19 @@ def plan_and_write_path(
             sid = rack_id_to_stop.get(rid_str)
             if sid:
                 allowed_stops[sid] = True
+    # Include pickup, check, and drop stops for picking tasks
+    if pickup_stops:
+        for s in pickup_stops:
+            if str(s).strip():
+                allowed_stops[str(s).strip()] = True
+    if check_stops:
+        for s in check_stops:
+            if str(s).strip():
+                allowed_stops[str(s).strip()] = True
+    if drop_stops:
+        for s in drop_stops:
+            if str(s).strip():
+                allowed_stops[str(s).strip()] = True
     if allowed_stops:
         stops_rows = [
             r for r in stops_rows
@@ -363,6 +383,21 @@ def plan_and_write_path(
     fs, ts = _read_device_speeds(device_id)
     vs = _read_device_vertical_speed(device_id)
 
+    # Build stop_operations mapping: stop_id -> operation ('pickup', 'check', 'drop')
+    stop_operations: Dict[str, str] = {}
+    if pickup_stops:
+        for stop_id in pickup_stops:
+            stop_operations[str(stop_id)] = 'pickup'
+    if check_stops:
+        for stop_id in check_stops:
+            stop_operations[str(stop_id)] = 'check'
+    if drop_stops:
+        for stop_id in drop_stops:
+            stop_operations[str(stop_id)] = 'drop'
+    
+    # Use end_zone if provided, otherwise fallback to drop_zone for backward compatibility
+    target_end_zone = end_zone if end_zone else drop_zone
+
     cmds = generate_path_commands(
         graph=graph,
         zones_rows=zones_rows,
@@ -376,7 +411,9 @@ def plan_and_write_path(
         task_type=task_type,
         zone_alignment=zone_alignment,
         selected_racks_by_stop=selected_racks_by_stop,
-        drop_zone=drop_zone,
+        drop_zone=drop_zone,  # Keep for backward compatibility
+        end_zone=target_end_zone,
+        stop_operations=stop_operations if stop_operations else None,
     )
 
     if task_type and str(task_type).lower() == 'charging':

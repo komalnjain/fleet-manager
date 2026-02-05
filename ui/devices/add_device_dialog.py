@@ -686,6 +686,10 @@ class AddDeviceDialog(BaseDialog):
                 QMessageBox.warning(self, "Error", "Failed to create PICKUP logic file")
                 return
 
+            # Create END logic file
+            if not self.create_end_logic_file(device_id):
+                QMessageBox.warning(self, "Error", "Failed to create END logic file")
+                return
 
             # Add initial log entry
             if not self.add_device_log_entry(
@@ -882,6 +886,22 @@ class AddDeviceDialog(BaseDialog):
             return True
         except Exception as e:
             print(f"Error creating PICKUP logic file: {e}")
+            return False
+
+    def create_end_logic_file(self, device_id: str) -> bool:
+        """Create {device_id}_END_Logic.csv for end zone logic commands"""
+        try:
+            file_path = Path('data/device_logs') / f"{device_id}_END_Logic.csv"
+            file_path.parent.mkdir(parents=True, exist_ok=True)
+
+            # Create empty file (no headers, user will add content directly)
+            with open(file_path, 'w', newline='', encoding='utf-8') as f:
+                pass  # Create empty file
+
+            print(f"Created END logic file: {file_path}")
+            return True
+        except Exception as e:
+            print(f"Error creating END logic file: {e}")
             return False
 
     def add_device_log_entry(self, device_id: str, status: str, battery_level: int, notes: str = '') -> bool:

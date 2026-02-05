@@ -820,7 +820,7 @@ class TaskMonitorWidget(QWidget):
             if from_zone and to_zone:
                 zone_path = [from_zone, to_zone]
 
-        # New picking semantics: pickup_stops + pickup_racks + drop_zone
+        # New picking semantics: pickup_stops + check_stops + drop_stops + end_zone
         try:
             raw_pickup = details.get('pickup_stops') or []
             if isinstance(raw_pickup, list):
@@ -837,11 +837,31 @@ class TaskMonitorWidget(QWidget):
         except Exception:
             pickup_racks = []
 
-        dz = details.get('drop_zone') or details.get('drop_zone_id')
-        if dz is not None and str(dz).strip():
-            drop_zone = str(dz).strip()
+        # Parse new stop types
+        check_stops: list[str] = []
+        try:
+            raw_check = details.get('check_stops') or []
+            if isinstance(raw_check, list):
+                check_stops = [str(s) for s in raw_check]
+        except Exception:
+            check_stops = []
 
-        return map_id, from_zone, to_zone, zone_path, pickup_stops, pickup_racks, drop_zone
+        drop_stops: list[str] = []
+        try:
+            raw_drop = details.get('drop_stops') or []
+            if isinstance(raw_drop, list):
+                drop_stops = [str(s) for s in raw_drop]
+        except Exception:
+            drop_stops = []
+
+        # Prefer end_zone, fallback to drop_zone for backward compatibility
+        end_zone: str | None = None
+        dz = details.get('end_zone') or details.get('drop_zone') or details.get('drop_zone_id')
+        if dz is not None and str(dz).strip():
+            end_zone = str(dz).strip()
+        drop_zone = end_zone  # Keep drop_zone for backward compatibility
+
+        return map_id, from_zone, to_zone, zone_path, pickup_stops, pickup_racks, drop_zone, check_stops, drop_stops, end_zone
 
     def generate_path_planning_for_selected_task(self):
         """Generate and write path commands for the selected task/device."""
@@ -869,6 +889,9 @@ class TaskMonitorWidget(QWidget):
                 pickup_stops,
                 pickup_racks,
                 drop_zone,
+                check_stops,
+                drop_stops,
+                end_zone,
             ) = self._parse_task_map_and_path(self.selected_task)
 
             if not map_id:
@@ -900,16 +923,129 @@ class TaskMonitorWidget(QWidget):
                         from services.path_planner_service import plan_and_write_picking_path
 
                         try:
-                            out_path = plan_and_write_picking_path(
+                            # Use new path generation with stop operations
+                            from services.path_planner_service import plan_and_write_path
+                            
+                            # Get current zone
+                            current_zone = None
+                            try:
+                                nav = get_zone_navigation_manager()
+                                nav_info = nav.get_navigation_info(device_id)
+                                current_zone = nav_info.get('current_zone')
+                            except Exception:
+                                current_zone = self._derive_start_zone_for_audit(device_id, map_id)
+                            
+                            # Build zone sequence that visits all stops in order
+                            # Need to find which zone connections contain each stop
+                            zones = self.csv_handler.read_csv('zones')
+                            stops_data = self.csv_handler.read_csv('stops')
+                            
+                            # Map stop_id to zone connection (from_zone, to_zone)
+                            stop_to_zone_conn = {}
+                            for stop_row in stops_data:
+                                if str(stop_row.get('map_id')) != str(map_id):
+                                    continue
+                                stop_id = str(stop_row.get('stop_id', '')).strip()
+                                conn_id = str(stop_row.get('zone_connection_id', '')).strip()
+                                if stop_id and conn_id:
+                                    # Find the zone connection
+                                    for zone_row in zones:
+                                        if str(zone_row.get('id')) == conn_id:
+                                            from_z = str(zone_row.get('from_zone', ''))
+                                            to_z = str(zone_row.get('to_zone', ''))
+                                            if from_z and to_z:
+                                                stop_to_zone_conn[stop_id] = (from_z, to_z)
+                                            break
+                            
+                            # Build zone sequence: visit all stops in order (pickup → check → drop) then end zone
+                            zone_sequence = []
+                            last_zone = str(current_zone) if current_zone else None
+                            
+                            # Collect all stops in order
+                            all_stops_ordered = []
+                            if pickup_stops:
+                                all_stops_ordered.extend([(s, 'pickup') for s in pickup_stops])
+                            if check_stops:
+                                all_stops_ordered.extend([(s, 'check') for s in check_stops])
+                            if drop_stops:
+                                all_stops_ordered.extend([(s, 'drop') for s in drop_stops])
+                            
+                            # Build zone sequence visiting each stop
+                            visited_edges = set()
+                            for stop_id, _ in all_stops_ordered:
+                                if stop_id in stop_to_zone_conn:
+                                    from_z, to_z = stop_to_zone_conn[stop_id]
+                                    edge_key = (from_z, to_z)
+                                    
+                                    # If we haven't visited this edge yet, add it to sequence
+                                    if edge_key not in visited_edges:
+                                        # If we're not at the from_zone, add path to get there
+                                        if last_zone and last_zone != from_z:
+                                            # Use A* or direct path - for now, add direct connection if exists
+                                            # Check if there's a direct path
+                                            found_path = False
+                                            for z_row in zones:
+                                                if (str(z_row.get('map_id')) == str(map_id) and
+                                                    str(z_row.get('from_zone')) == str(last_zone) and
+                                                    str(z_row.get('to_zone')) == from_z):
+                                                    zone_sequence.append((str(last_zone), from_z))
+                                                    last_zone = from_z
+                                                    found_path = True
+                                                    break
+                                            # If no direct path, add the edge anyway (A* will handle it)
+                                            if not found_path:
+                                                zone_sequence.append((str(last_zone), from_z))
+                                                last_zone = from_z
+                                        
+                                        # Add the edge containing the stop
+                                        zone_sequence.append((from_z, to_z))
+                                        visited_edges.add(edge_key)
+                                        last_zone = to_z
+                            
+                            # Finally, go to end zone if not already there
+                            if end_zone and last_zone != str(end_zone):
+                                # Check if there's a direct path to end zone
+                                found_path = False
+                                for z_row in zones:
+                                    if (str(z_row.get('map_id')) == str(map_id) and
+                                        str(z_row.get('from_zone')) == str(last_zone) and
+                                        str(z_row.get('to_zone')) == str(end_zone)):
+                                        zone_sequence.append((str(last_zone), str(end_zone)))
+                                        found_path = True
+                                        break
+                                if not found_path:
+                                    zone_sequence.append((str(last_zone), str(end_zone)))
+                            
+                            # If no zone sequence built, create a simple one
+                            if not zone_sequence:
+                                start_z = str(current_zone) if current_zone else '1'
+                                end_z = str(end_zone) if end_zone else (str(drop_zone) if drop_zone else '1')
+                                zone_sequence = [(start_z, end_z)]
+                            
+                            initial_direction = 'north'
+                            try:
+                                nav = get_zone_navigation_manager()
+                                nav_info = nav.get_navigation_info(device_id)
+                                initial_direction = (nav_info.get('locked_direction') or 'north')
+                            except Exception:
+                                pass
+                            
+                            self.logger.info(f"Building path with zone_sequence: {zone_sequence}, stops: pickup={pickup_stops}, check={check_stops}, drop={drop_stops}")
+                            
+                            out_path = plan_and_write_path(
                                 device_id=device_id,
                                 map_id=str(map_id),
+                                zone_sequence=zone_sequence,
+                                initial_direction=str(initial_direction).lower(),
+                                task_type='picking',
                                 pickup_stops=pickup_stops,
-                                pickup_racks=pickup_racks,
-                                drop_zone=str(drop_zone)
+                                check_stops=check_stops,
+                                drop_stops=drop_stops,
+                                end_zone=str(end_zone) if end_zone else str(drop_zone) if drop_zone else None,
                             )
                             results.append(f"{device_id}: {out_path}")
                         except Exception as e:
-                            self.logger.error(f"Failed to generate picking path: {e}")
+                            self.logger.error(f"Failed to generate picking path: {e}", exc_info=True)
                             QMessageBox.critical(self, "Error", f"Failed to generate picking path: {e}")
                             return
                         continue  # Skip the standard plan_and_write_path call below
@@ -950,6 +1086,32 @@ class TaskMonitorWidget(QWidget):
                 except Exception:
                     initial_direction = 'north'
 
+                # For storing tasks, extract check_stops and drop_stops from task_details
+                storing_check_stops = []
+                storing_drop_stops = []
+                storing_end_zone = None
+                if task_type == 'storing':
+                    try:
+                        import json
+                        raw = self.selected_task.get('task_details') or ''
+                        details = json.loads(raw) if isinstance(raw, str) and raw.strip() else {}
+                        storing_check_stops = [str(s) for s in details.get('check_stops', [])]
+                        storing_drop_stops = [str(s) for s in details.get('drop_stops', [])]
+                        storing_end_zone = str(details.get('end_zone') or '') or None
+                    except Exception:
+                        pass
+                
+                # For auditing tasks, extract end_zone
+                auditing_end_zone = None
+                if task_type == 'auditing':
+                    try:
+                        import json
+                        raw = self.selected_task.get('task_details') or ''
+                        details = json.loads(raw) if isinstance(raw, str) and raw.strip() else {}
+                        auditing_end_zone = str(details.get('end_zone') or '') or None
+                    except Exception:
+                        pass
+
                 out_path = plan_and_write_path(
                     device_id=device_id,
                     map_id=str(map_id),
@@ -958,7 +1120,10 @@ class TaskMonitorWidget(QWidget):
                     task_type=task_type,
                     selected_stop_ids=pickup_stops if task_type == 'picking' else None,
                     selected_rack_ids=pickup_racks if task_type == 'picking' else None,
-                    drop_zone=drop_zone if task_type == 'picking' else None,
+                    drop_zone=drop_zone if task_type == 'picking' else None,  # Backward compatibility
+                    end_zone=end_zone if task_type == 'picking' else (storing_end_zone if task_type == 'storing' else auditing_end_zone),
+                    check_stops=check_stops if task_type == 'picking' else (storing_check_stops if task_type == 'storing' else None),
+                    drop_stops=drop_stops if task_type == 'picking' else (storing_drop_stops if task_type == 'storing' else None),
                 )
 
                 results.append(f"{device_id}: {out_path}")

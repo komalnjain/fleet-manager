@@ -244,6 +244,7 @@ def generate_edge_commands(
     task_type: Optional[str] = None,
     vertical_speed: Optional[int] = None,
     selected_racks_by_stop: Optional[Dict[str, List[Tuple[str, float]]]] = None,
+    stop_operations: Optional[Dict[str, str]] = None,  # Maps stop_id to operation: 'pickup', 'check', 'drop'
 ) -> Tuple[List[Tuple[Any, ...]], Direction]:
     """
     Generate commands to traverse a single edge from current offset to end, visiting stops.
@@ -284,11 +285,54 @@ def generate_edge_commands(
                 commands.append(('SR', mm(stop.side_distance_m), 'MM'))
                 commands.append(('SL', mm(stop.side_distance_m), 'MM'))
 
-        # Logical task callback at the stop (PICKUP/STORE/AUDIT)
-        if task_type:
+        # Logical task callback at the stop - use stop_operations if provided, otherwise fallback to task_type
+        stop_key = getattr(stop, 'stop_id', '') or ''
+        operation = None
+        if stop_operations and stop_key:
+            operation = stop_operations.get(str(stop_key))
+        
+        if operation:
+            # Use specific operation for this stop
+            if operation == 'pickup':
+                per_stop_racks: List[Tuple[str, float]] = []
+                try:
+                    if selected_racks_by_stop and stop_key:
+                        per_stop_racks = selected_racks_by_stop.get(str(stop_key), []) or []
+                except Exception:
+                    per_stop_racks = []
+
+                if per_stop_racks and vertical_speed:
+                    try:
+                        vs_val = int(vertical_speed)
+                    except Exception:
+                        vs_val = 0
+                    if vs_val <= 0:
+                        commands.append(('CALL', 'PICKUP'))
+                    else:
+                        for _, rack_mm in per_stop_racks:
+                            try:
+                                mm_val = int(round(float(rack_mm)))
+                            except Exception:
+                                try:
+                                    mm_val = int(rack_mm)  # type: ignore[arg-type]
+                                except Exception:
+                                    mm_val = 0
+                            if mm_val > 0:
+                                commands.append(('VMOV', mm_val, vs_val))
+                                commands.append(('CALL', 'PICKUP'))
+                                commands.append(('VMOV', mm_val, vs_val))
+                            else:
+                                commands.append(('CALL', 'PICKUP'))
+                else:
+                    commands.append(('CALL', 'PICKUP'))
+            elif operation == 'check':
+                commands.append(('CALL', 'CHECK'))
+            elif operation == 'drop':
+                commands.append(('CALL', 'DROP'))
+        elif task_type:
+            # Fallback to task_type-based logic
             tt = str(task_type).lower()
             if tt == 'picking':
-                stop_key = getattr(stop, 'stop_id', '') or ''
                 per_stop_racks: List[Tuple[str, float]] = []
                 try:
                     if selected_racks_by_stop and stop_key:
@@ -345,6 +389,8 @@ def generate_path_commands(
     zone_alignment: Optional[Dict[str, str]] = None,
     selected_racks_by_stop: Optional[Dict[str, List[Tuple[str, float]]]] = None,
     drop_zone: Optional[str] = None,
+    end_zone: Optional[str] = None,  # Renamed from drop_zone, but keeping drop_zone for backward compatibility
+    stop_operations: Optional[Dict[str, str]] = None,  # Maps stop_id to operation: 'pickup', 'check', 'drop'
 ) -> List[Tuple[Any, ...]]:
     # Helper to choose ALIGN variant based on per-zone alignment settings.
     def _align_cmd(zone: ZoneId) -> Tuple[str, str, str, str]:
@@ -405,6 +451,7 @@ def generate_path_commands(
                     task_type=task_type,
                     vertical_speed=vertical_speed,
                     selected_racks_by_stop=selected_racks_by_stop,
+                    stop_operations=stop_operations,
                 )
                 cmds.extend(seg_cmds)
                 last_arrival_zone = sub_edge.to_zone
@@ -425,6 +472,7 @@ def generate_path_commands(
                 task_type=task_type,
                 vertical_speed=vertical_speed,
                 selected_racks_by_stop=selected_racks_by_stop,
+                stop_operations=stop_operations,
             )
             cmds.extend(seg_cmds)
             offset_m_for_first_edge = 0.0
@@ -432,36 +480,29 @@ def generate_path_commands(
             try:
                 if i < len(zone_sequence) - 1:
                     cmds.append(_align_cmd(edge.to_zone))
-                # For picking tasks with drop_zone, add ALIGN then CALL,DROP when arriving at drop zone
-                if task_type and str(task_type).lower() == 'picking' and drop_zone:
-                    if str(edge.to_zone) == str(drop_zone):
-                        # Ensure ALIGN is added before DROP if not already
-                        if i >= len(zone_sequence) - 1:  # Last edge - need to add ALIGN first
-                            cmds.append(_align_cmd(edge.to_zone))
-                        # First, insert CHECK so device will run check logic and wait if needed
-                        try:
-                            cmds.append(('CALL', 'CHECK'))
-                        except Exception:
-                            pass
-                        # Then perform DROP
-                        cmds.append(('CALL', 'DROP'))
+                # Handle end_zone (preferred) or drop_zone (backward compatibility)
+                # End zone is just a final destination - no operations here
+                # DROP operations happen at drop_stops (handled in generate_edge_commands via stop_operations)
+                target_end_zone = end_zone if end_zone else drop_zone
+                if target_end_zone:
+                    if str(edge.to_zone) == str(target_end_zone) and i >= len(zone_sequence) - 1:
+                        # Last edge reaching end zone - add ALIGN and END marker
+                        # END is just a marker for final destination, no operations
+                        cmds.append(_align_cmd(edge.to_zone))
+                        cmds.append(('CALL', 'END'))
             except Exception:
                 pass
 
     # Append final ALIGN at the last arrival zone, if available
-    # Skip for picking tasks with drop_zone - ALIGN was already added before DROP
+    # Skip for tasks with end_zone - ALIGN was already added before END
     if last_arrival_zone is not None:
         try:
-            # For picking with drop_zone, skip final ALIGN (already added before DROP)
-            if task_type and str(task_type).lower() == 'picking' and drop_zone:
-                pass  # ALIGN already added with DROP
+            target_end_zone = end_zone if end_zone else drop_zone
+            # For tasks with end_zone, skip final ALIGN (already added before END)
+            if target_end_zone and str(last_arrival_zone) == str(target_end_zone):
+                pass  # ALIGN already added with END
             else:
                 cmds.append(_align_cmd(last_arrival_zone))
-            
-            # For picking tasks without drop_zone, add legacy DROP at end
-            if task_type and str(task_type).lower() == 'picking':
-                if not drop_zone:
-                    cmds.append(('CALL', 'DROP'))
         except Exception:
             pass
 
@@ -597,8 +638,7 @@ def serialize_commands_to_csv_rows(cmds: List[Tuple[Any, ...]], device_id: Optio
     rows.append(["RETURN"])
     rows.append([])  # Blank line
     rows.append(["LABEL", "DROP"])
-    
-    # Insert content from {device_id}_DROP_Logic.csv if it exists
+
     if device_id:
         drop_logic_path = os.path.join(
             os.path.dirname(os.path.dirname(__file__)),
@@ -609,12 +649,30 @@ def serialize_commands_to_csv_rows(cmds: List[Tuple[Any, ...]], device_id: Optio
                 with open(drop_logic_path, 'r', newline='', encoding='utf-8') as f:
                     for line in f:
                         line = line.strip()
-                        if line:  # Skip empty lines
-                            # Split by comma to create a row
+                        if line:
                             rows.append(line.split(','))
             except Exception:
-                pass  # If file read fails, just skip
-    
+                pass
+
+    rows.append(["RETURN"])
+    rows.append([])  # Blank line
+    rows.append(["LABEL", "END"])
+
+    if device_id:
+        end_logic_path = os.path.join(
+            os.path.dirname(os.path.dirname(__file__)),
+            "data", "device_logs", f"{device_id}_END_Logic.csv"
+        )
+        if os.path.exists(end_logic_path):
+            try:
+                with open(end_logic_path, 'r', newline='', encoding='utf-8') as f:
+                    for line in f:
+                        line = line.strip()
+                        if line:
+                            rows.append(line.split(','))
+            except Exception:
+                pass
+
     rows.append(["RETURN"])
     
     return rows

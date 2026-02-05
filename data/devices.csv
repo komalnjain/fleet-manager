@@ -1,2 +1,1 @@
 id,device_id,device_name,device_model,forward_speed,turning_speed,vertical_speed,horizontal_speed,status,battery_level,current_map,current_location,wheel_diameter,distance_between_wheels,length,width,height,lifting_height,distance,created_at,updated_at
-1,rob3,rob3,V1,0,0,0,0,working,98,19,1,0.00,0.00,0.00,0.00,0.00,0.00,0.00,2026-02-05T01:55:50.713593,2026-02-05T02:58:16.429096
