@@ -55530,3 +55530,455 @@
 2026-02-06 00:01:22,904 - device_list - INFO - device_list.py:310 - Refreshing device data...
 2026-02-06 00:01:22,941 - device_list - INFO - device_list.py:330 - Loaded 0 devices from CSV
 2026-02-06 00:01:41,156 - main_window - INFO - main_window.py:435 - Application closing
+2026-02-05 23:13:43,654 - warehouse_app - INFO - main.py:32 - Starting Warehouse Management System v1.0.0
+2026-02-05 23:13:43,765 - devices_api - INFO - devices.py:27 - Device location syncer initialized
+2026-02-05 23:13:43,765 - notification_monitor - INFO - notification_monitor.py:37 - NotificationMonitor initialized
+2026-02-05 23:13:44,121 - main_window - INFO - main_window.py:124 - Dashboard widget loaded successfully
+2026-02-05 23:13:44,135 - devices_api - INFO - devices.py:27 - Device location syncer initialized
+2026-02-05 23:13:44,165 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:13:44,165 - device_list - INFO - device_list.py:330 - Loaded 0 devices from CSV
+2026-02-05 23:13:44,177 - main_window - INFO - main_window.py:134 - Device Management widget loaded successfully
+2026-02-05 23:13:44,196 - main_window - INFO - main_window.py:145 - Rack Management widget loaded successfully
+2026-02-05 23:13:44,218 - product_management - INFO - product_management.py:143 - Loaded 0 products from CSV
+2026-02-05 23:13:44,222 - main_window - INFO - main_window.py:155 - Product Management widget loaded successfully
+2026-02-05 23:13:44,338 - main_window - INFO - main_window.py:166 - Task Creation widget loaded successfully
+2026-02-05 23:13:44,351 - devices_api - INFO - devices.py:27 - Device location syncer initialized
+2026-02-05 23:13:44,383 - main_window - INFO - main_window.py:177 - Task Monitor widget loaded successfully
+2026-02-05 23:13:44,412 - user_management - INFO - user_management.py:581 - Refreshing user data...
+2026-02-05 23:13:44,413 - user_management - INFO - user_management.py:603 - Loaded 12 users from CSV
+2026-02-05 23:13:44,424 - main_window - INFO - main_window.py:187 - User Management widget loaded successfully
+2026-02-05 23:13:44,795 - map_management - INFO - map_management.py:64 - Map Management widget initialized
+2026-02-05 23:13:44,869 - main_window - INFO - main_window.py:198 - Map Management widget loaded successfully
+2026-02-05 23:13:44,874 - devices_api - INFO - devices.py:27 - Device location syncer initialized
+2026-02-05 23:13:45,013 - main_window - INFO - main_window.py:209 - Device Tracking widget loaded successfully
+2026-02-05 23:13:45,088 - main_window - INFO - main_window.py:219 - Robot Control widget loaded successfully
+2026-02-05 23:13:47,120 - api_client - WARNING - client.py:80 - Request attempt 1 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:13:49,169 - api_client - WARNING - client.py:80 - Request attempt 2 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:13:51,211 - api_client - WARNING - client.py:80 - Request attempt 3 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:13:51,212 - warehouse_app - INFO - main.py:62 - Main window created successfully
+2026-02-05 23:13:51,263 - warehouse_app - INFO - main.py:170 - Application started successfully
+2026-02-05 23:13:53,101 - main_window - INFO - main_window.py:339 - Refreshed data for Create Task
+2026-02-05 23:14:14,174 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:14:14,176 - device_list - INFO - device_list.py:330 - Loaded 0 devices from CSV
+2026-02-05 23:14:44,179 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:14:44,197 - device_list - INFO - device_list.py:330 - Loaded 0 devices from CSV
+2026-02-05 23:14:47,113 - api_client - WARNING - client.py:80 - Request attempt 1 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:14:49,134 - api_client - WARNING - client.py:80 - Request attempt 2 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:14:51,163 - api_client - WARNING - client.py:80 - Request attempt 3 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:15:00,005 - main_window - INFO - main_window.py:339 - Refreshed data for Map Management
+2026-02-05 23:15:14,168 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:15:14,175 - device_list - INFO - device_list.py:330 - Loaded 0 devices from CSV
+2026-02-05 23:15:21,430 - csv_handler - INFO - csv_handler.py:252 - Successfully appended row to stops CSV with ID: 21
+2026-02-05 23:15:30,000 - main_window - INFO - main_window.py:339 - Refreshed data for Create Task
+2026-02-05 23:15:44,175 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:15:44,185 - device_list - INFO - device_list.py:330 - Loaded 0 devices from CSV
+2026-02-05 23:15:47,118 - api_client - WARNING - client.py:80 - Request attempt 1 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:15:49,146 - api_client - WARNING - client.py:80 - Request attempt 2 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:15:51,186 - api_client - WARNING - client.py:80 - Request attempt 3 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:15:53,398 - task_creation - INFO - task_creation.py:2075 - Pickup stops selected: ['x']
+2026-02-05 23:16:11,271 - task_creation - INFO - task_creation.py:1049 - Loaded 0 devices (0 selectable)
+2026-02-05 23:16:14,166 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:16:14,166 - device_list - INFO - device_list.py:330 - Loaded 0 devices from CSV
+2026-02-05 23:16:34,106 - product_management - INFO - product_management.py:143 - Loaded 0 products from CSV
+2026-02-05 23:16:34,106 - main_window - INFO - main_window.py:339 - Refreshed data for Product Management
+2026-02-05 23:16:35,007 - main_window - INFO - main_window.py:339 - Refreshed data for Rack Management
+2026-02-05 23:16:36,584 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:16:36,584 - device_list - INFO - device_list.py:330 - Loaded 0 devices from CSV
+2026-02-05 23:16:36,584 - main_window - INFO - main_window.py:339 - Refreshed data for Device Management
+2026-02-05 23:16:44,171 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:16:44,177 - device_list - INFO - device_list.py:330 - Loaded 0 devices from CSV
+2026-02-05 23:16:47,119 - api_client - WARNING - client.py:80 - Request attempt 1 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:16:49,167 - api_client - WARNING - client.py:80 - Request attempt 2 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:16:51,207 - api_client - WARNING - client.py:80 - Request attempt 3 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:16:51,223 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:16:51,230 - device_list - INFO - device_list.py:330 - Loaded 0 devices from CSV
+2026-02-05 23:16:55,541 - main_window - INFO - main_window.py:339 - Refreshed data for Rack Management
+2026-02-05 23:16:56,751 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:16:56,761 - device_list - INFO - device_list.py:330 - Loaded 0 devices from CSV
+2026-02-05 23:16:56,761 - main_window - INFO - main_window.py:339 - Refreshed data for Device Management
+2026-02-05 23:17:02,984 - main_window - INFO - main_window.py:339 - Refreshed data for Dashboard
+2026-02-05 23:17:03,477 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:17:03,486 - device_list - INFO - device_list.py:330 - Loaded 0 devices from CSV
+2026-02-05 23:17:03,486 - main_window - INFO - main_window.py:339 - Refreshed data for Device Management
+2026-02-05 23:17:14,166 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:17:14,171 - device_list - INFO - device_list.py:330 - Loaded 0 devices from CSV
+2026-02-05 23:17:15,101 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:17:15,107 - device_list - INFO - device_list.py:330 - Loaded 0 devices from CSV
+2026-02-05 23:17:22,687 - main_window - INFO - main_window.py:339 - Refreshed data for Map Management
+2026-02-05 23:17:26,368 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:17:26,374 - device_list - INFO - device_list.py:330 - Loaded 0 devices from CSV
+2026-02-05 23:17:26,374 - main_window - INFO - main_window.py:339 - Refreshed data for Device Management
+2026-02-05 23:17:30,439 - main_window - INFO - main_window.py:339 - Refreshed data for Create Task
+2026-02-05 23:17:31,921 - main_window - INFO - main_window.py:339 - Refreshed data for Task Monitor
+2026-02-05 23:17:36,065 - task_monitor - INFO - task_monitor.py:1059 - Building path with zone_sequence: [('1', '2'), ('2', '3')], stops: pickup=['x'], check=['z'], drop=['y']
+2026-02-05 23:17:44,180 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:17:44,183 - device_list - INFO - device_list.py:330 - Loaded 0 devices from CSV
+2026-02-05 23:17:47,135 - api_client - WARNING - client.py:80 - Request attempt 1 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:17:49,169 - api_client - WARNING - client.py:80 - Request attempt 2 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:17:51,219 - api_client - WARNING - client.py:80 - Request attempt 3 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:17:58,636 - main_window - INFO - main_window.py:339 - Refreshed data for Rack Management
+2026-02-05 23:17:59,598 - main_window - INFO - main_window.py:339 - Refreshed data for Rack Management
+2026-02-05 23:18:00,014 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:18:00,017 - device_list - INFO - device_list.py:330 - Loaded 0 devices from CSV
+2026-02-05 23:18:00,017 - main_window - INFO - main_window.py:339 - Refreshed data for Device Management
+2026-02-05 23:18:14,172 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:18:14,173 - device_list - INFO - device_list.py:330 - Loaded 0 devices from CSV
+2026-02-05 23:18:15,097 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:18:15,097 - device_list - INFO - device_list.py:330 - Loaded 0 devices from CSV
+2026-02-05 23:18:21,319 - device_list - INFO - device_list.py:475 - Attempting to save device data: {'device_id': 'rob3', 'device_name': 'rob3', 'forward_speed': 0, 'turning_speed': 0, 'vertical_speed': 0, 'horizontal_speed': 0, 'status': 'working', 'battery_level': 100, 'current_map': '20', 'current_location': '1', 'device_model': 'V1', 'wheel_diameter': '0.00', 'distance_between_wheels': '0.00', 'length': '0.00', 'width': '0.00', 'height': '0.00', 'lifting_height': '0.00', 'distance': '0.00', 'created_at': '2026-02-05T23:18:21.319648', 'updated_at': '2026-02-05T23:18:21.319648', 'id': 1}
+2026-02-05 23:18:21,319 - csv_handler - INFO - csv_handler.py:252 - Successfully appended row to devices CSV with ID: 1
+2026-02-05 23:18:22,790 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:18:22,831 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:18:22,831 - device_list - INFO - device_list.py:486 - Successfully added device: rob3
+2026-02-05 23:18:29,386 - main_window - INFO - main_window.py:339 - Refreshed data for Create Task
+2026-02-05 23:18:37,033 - task_creation - INFO - task_creation.py:1049 - Loaded 1 devices (1 selectable)
+2026-02-05 23:18:40,135 - csv_handler - INFO - csv_handler.py:252 - Successfully appended row to tasks CSV with ID: 7
+2026-02-05 23:18:40,135 - device_data_handler - INFO - device_data_handler.py:530 - Appended task TASK0007 (task_pending) to data\device_logs\rob3_task.csv
+2026-02-05 23:18:40,137 - task_creation - INFO - task_creation.py:1886 - Successfully created task: TASK0007
+2026-02-05 23:18:42,594 - task_creation - INFO - task_creation.py:2075 - Pickup stops selected: []
+2026-02-05 23:18:44,164 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:18:44,204 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:18:47,121 - api_client - WARNING - client.py:80 - Request attempt 1 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:18:49,152 - api_client - WARNING - client.py:80 - Request attempt 2 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:18:51,194 - api_client - WARNING - client.py:80 - Request attempt 3 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:18:51,215 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:18:51,253 - product_management - INFO - product_management.py:143 - Loaded 0 products from CSV
+2026-02-05 23:18:51,253 - main_window - INFO - main_window.py:339 - Refreshed data for Product Management
+2026-02-05 23:18:51,274 - main_window - INFO - main_window.py:339 - Refreshed data for Task Monitor
+2026-02-05 23:18:51,288 - main_window - INFO - main_window.py:339 - Refreshed data for Task Monitor
+2026-02-05 23:19:14,172 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:19:14,206 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:19:15,094 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:19:38,720 - csv_handler - INFO - csv_handler.py:203 - Successfully wrote 7 rows to tasks CSV
+2026-02-05 23:19:38,720 - csv_handler - INFO - csv_handler.py:275 - Successfully updated row 6 in tasks CSV
+2026-02-05 23:19:42,506 - task_monitor - INFO - task_monitor.py:1059 - Building path with zone_sequence: [('1', '2'), ('2', '3'), ('3', '4'), ('4', '5'), ('5', '2')], stops: pickup=['x'], check=['y'], drop=['z']
+2026-02-05 23:19:44,168 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:19:44,208 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:19:47,136 - api_client - WARNING - client.py:80 - Request attempt 1 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:19:49,167 - api_client - WARNING - client.py:80 - Request attempt 2 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:19:51,202 - api_client - WARNING - client.py:80 - Request attempt 3 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:19:51,243 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:20:14,176 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:20:14,255 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:20:15,089 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:20:44,180 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:20:44,263 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:20:47,144 - api_client - WARNING - client.py:80 - Request attempt 1 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:20:49,186 - api_client - WARNING - client.py:80 - Request attempt 2 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:20:51,216 - api_client - WARNING - client.py:80 - Request attempt 3 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:20:51,221 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:21:14,165 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:21:14,255 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:21:15,123 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:21:44,173 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:21:44,263 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:21:47,139 - api_client - WARNING - client.py:80 - Request attempt 1 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:21:49,184 - api_client - WARNING - client.py:80 - Request attempt 2 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:21:51,230 - api_client - WARNING - client.py:80 - Request attempt 3 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:21:51,236 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:22:04,824 - main_window - INFO - main_window.py:339 - Refreshed data for Map Management
+2026-02-05 23:22:14,168 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:22:14,213 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:22:15,145 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:22:44,176 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:22:44,273 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:22:47,141 - api_client - WARNING - client.py:80 - Request attempt 1 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:22:49,182 - api_client - WARNING - client.py:80 - Request attempt 2 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:22:51,207 - api_client - WARNING - client.py:80 - Request attempt 3 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:22:51,213 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:23:14,171 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:23:14,255 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:23:15,144 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:23:44,178 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:23:44,263 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:23:47,132 - api_client - WARNING - client.py:80 - Request attempt 1 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:23:49,178 - api_client - WARNING - client.py:80 - Request attempt 2 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:23:51,228 - api_client - WARNING - client.py:80 - Request attempt 3 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:23:51,235 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:24:14,168 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:24:14,253 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:24:15,147 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:24:44,175 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:24:44,262 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:24:47,129 - api_client - WARNING - client.py:80 - Request attempt 1 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:24:49,153 - api_client - WARNING - client.py:80 - Request attempt 2 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:24:51,194 - api_client - WARNING - client.py:80 - Request attempt 3 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:24:51,194 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:24:53,271 - main_window - INFO - main_window.py:339 - Refreshed data for Create Task
+2026-02-05 23:25:14,177 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:25:14,261 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:25:15,158 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:25:44,170 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:25:44,254 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:25:47,145 - api_client - WARNING - client.py:80 - Request attempt 1 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:25:49,167 - api_client - WARNING - client.py:80 - Request attempt 2 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:25:51,182 - api_client - WARNING - client.py:80 - Request attempt 3 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:25:51,182 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:26:14,169 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:26:14,256 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:26:15,152 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:26:44,174 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:26:44,261 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:26:47,161 - api_client - WARNING - client.py:80 - Request attempt 1 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:26:49,195 - api_client - WARNING - client.py:80 - Request attempt 2 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:26:51,224 - api_client - WARNING - client.py:80 - Request attempt 3 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:26:51,224 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:27:14,178 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:27:14,254 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:27:15,168 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:27:32,567 - main_window - INFO - main_window.py:339 - Refreshed data for Task Monitor
+2026-02-05 23:27:33,226 - main_window - INFO - main_window.py:339 - Refreshed data for Create Task
+2026-02-05 23:27:44,170 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:27:44,261 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:27:47,154 - api_client - WARNING - client.py:80 - Request attempt 1 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:27:49,166 - api_client - WARNING - client.py:80 - Request attempt 2 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:27:51,200 - api_client - WARNING - client.py:80 - Request attempt 3 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:27:51,234 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:28:14,193 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:28:14,293 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:28:15,152 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:28:21,653 - main_window - INFO - main_window.py:339 - Refreshed data for Map Management
+2026-02-05 23:28:44,264 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:28:44,396 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:28:47,148 - api_client - WARNING - client.py:80 - Request attempt 1 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:28:49,167 - api_client - WARNING - client.py:80 - Request attempt 2 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:28:51,202 - api_client - WARNING - client.py:80 - Request attempt 3 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:28:51,206 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:29:14,187 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:29:14,287 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:29:15,168 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:29:44,197 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:29:44,328 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:29:47,161 - api_client - WARNING - client.py:80 - Request attempt 1 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:29:49,179 - api_client - WARNING - client.py:80 - Request attempt 2 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:29:51,228 - api_client - WARNING - client.py:80 - Request attempt 3 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:29:51,228 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:30:14,193 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:30:14,306 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:30:15,170 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:30:44,197 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:30:44,312 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:30:47,163 - api_client - WARNING - client.py:80 - Request attempt 1 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:30:49,184 - api_client - WARNING - client.py:80 - Request attempt 2 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:30:51,219 - api_client - WARNING - client.py:80 - Request attempt 3 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:30:51,219 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:31:14,207 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:31:14,304 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:31:15,173 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:31:44,213 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:31:44,329 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:31:47,162 - api_client - WARNING - client.py:80 - Request attempt 1 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:31:49,184 - api_client - WARNING - client.py:80 - Request attempt 2 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:31:51,216 - api_client - WARNING - client.py:80 - Request attempt 3 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:31:51,221 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:32:14,207 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:32:14,339 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:32:15,176 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:32:44,216 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:32:44,329 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:32:47,155 - api_client - WARNING - client.py:80 - Request attempt 1 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:32:49,181 - api_client - WARNING - client.py:80 - Request attempt 2 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:32:51,217 - api_client - WARNING - client.py:80 - Request attempt 3 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:32:51,221 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:33:14,236 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:33:14,340 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:33:15,186 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:33:44,250 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:33:44,345 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:33:47,197 - api_client - WARNING - client.py:80 - Request attempt 1 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:33:49,247 - api_client - WARNING - client.py:80 - Request attempt 2 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:33:51,281 - api_client - WARNING - client.py:80 - Request attempt 3 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:33:51,284 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:34:14,320 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:34:14,406 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:34:15,202 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:34:44,281 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:34:44,380 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:34:47,146 - api_client - WARNING - client.py:80 - Request attempt 1 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:34:49,169 - api_client - WARNING - client.py:80 - Request attempt 2 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:34:51,197 - api_client - WARNING - client.py:80 - Request attempt 3 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:34:51,197 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:35:14,276 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:35:14,357 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:35:15,224 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:35:44,279 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:35:44,327 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:35:47,164 - api_client - WARNING - client.py:80 - Request attempt 1 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:35:49,200 - api_client - WARNING - client.py:80 - Request attempt 2 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:35:51,250 - api_client - WARNING - client.py:80 - Request attempt 3 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:35:51,284 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:35:51,404 - product_management - INFO - product_management.py:143 - Loaded 0 products from CSV
+2026-02-05 23:35:51,405 - main_window - INFO - main_window.py:339 - Refreshed data for Product Management
+2026-02-05 23:35:51,405 - main_window - INFO - main_window.py:435 - Application closing
+2026-02-05 23:35:51,424 - main_window - INFO - main_window.py:435 - Application closing
+2026-02-05 23:41:32,566 - warehouse_app - INFO - main.py:32 - Starting Warehouse Management System v1.0.0
+2026-02-05 23:41:32,669 - devices_api - INFO - devices.py:27 - Device location syncer initialized
+2026-02-05 23:41:32,670 - notification_monitor - INFO - notification_monitor.py:37 - NotificationMonitor initialized
+2026-02-05 23:41:33,010 - main_window - INFO - main_window.py:124 - Dashboard widget loaded successfully
+2026-02-05 23:41:33,019 - devices_api - INFO - devices.py:27 - Device location syncer initialized
+2026-02-05 23:41:33,050 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:41:33,105 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:41:33,123 - main_window - INFO - main_window.py:134 - Device Management widget loaded successfully
+2026-02-05 23:41:33,150 - main_window - INFO - main_window.py:145 - Rack Management widget loaded successfully
+2026-02-05 23:41:33,184 - product_management - INFO - product_management.py:143 - Loaded 0 products from CSV
+2026-02-05 23:41:33,189 - main_window - INFO - main_window.py:155 - Product Management widget loaded successfully
+2026-02-05 23:41:33,323 - main_window - INFO - main_window.py:166 - Task Creation widget loaded successfully
+2026-02-05 23:41:33,328 - devices_api - INFO - devices.py:27 - Device location syncer initialized
+2026-02-05 23:41:33,357 - main_window - INFO - main_window.py:177 - Task Monitor widget loaded successfully
+2026-02-05 23:41:33,387 - user_management - INFO - user_management.py:581 - Refreshing user data...
+2026-02-05 23:41:33,389 - user_management - INFO - user_management.py:603 - Loaded 12 users from CSV
+2026-02-05 23:41:33,398 - main_window - INFO - main_window.py:187 - User Management widget loaded successfully
+2026-02-05 23:41:33,777 - map_management - INFO - map_management.py:64 - Map Management widget initialized
+2026-02-05 23:41:33,849 - main_window - INFO - main_window.py:198 - Map Management widget loaded successfully
+2026-02-05 23:41:33,853 - devices_api - INFO - devices.py:27 - Device location syncer initialized
+2026-02-05 23:41:34,038 - main_window - INFO - main_window.py:209 - Device Tracking widget loaded successfully
+2026-02-05 23:41:34,109 - main_window - INFO - main_window.py:219 - Robot Control widget loaded successfully
+2026-02-05 23:41:36,153 - api_client - WARNING - client.py:80 - Request attempt 1 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:41:38,192 - api_client - WARNING - client.py:80 - Request attempt 2 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:41:40,243 - api_client - WARNING - client.py:80 - Request attempt 3 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:41:40,244 - warehouse_app - INFO - main.py:62 - Main window created successfully
+2026-02-05 23:41:40,297 - warehouse_app - INFO - main.py:170 - Application started successfully
+2026-02-05 23:41:41,807 - main_window - INFO - main_window.py:339 - Refreshed data for Create Task
+2026-02-05 23:42:03,054 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:42:03,095 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:42:04,114 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:42:14,692 - main_window - INFO - main_window.py:339 - Refreshed data for Map Management
+2026-02-05 23:42:33,053 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:42:33,084 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:42:36,135 - api_client - WARNING - client.py:80 - Request attempt 1 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:42:38,170 - api_client - WARNING - client.py:80 - Request attempt 2 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:42:40,203 - api_client - WARNING - client.py:80 - Request attempt 3 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:42:40,226 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:43:00,920 - csv_handler - INFO - csv_handler.py:203 - Successfully wrote 20 rows to stops CSV
+2026-02-05 23:43:00,920 - csv_handler - INFO - csv_handler.py:275 - Successfully updated row 20 in stops CSV
+2026-02-05 23:43:03,050 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:43:03,091 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:43:04,129 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:43:33,041 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:43:33,079 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:43:36,168 - api_client - WARNING - client.py:80 - Request attempt 1 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:43:38,212 - api_client - WARNING - client.py:80 - Request attempt 2 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:43:40,247 - api_client - WARNING - client.py:80 - Request attempt 3 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:43:40,251 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:44:03,050 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:44:03,098 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:44:04,148 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:44:33,051 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:44:33,104 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:44:36,166 - api_client - WARNING - client.py:80 - Request attempt 1 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:44:38,202 - api_client - WARNING - client.py:80 - Request attempt 2 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:44:40,222 - api_client - WARNING - client.py:80 - Request attempt 3 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:44:40,227 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:45:03,049 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:45:03,115 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:45:04,143 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:45:33,048 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:45:33,110 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:53:25,842 - warehouse_app - INFO - main.py:32 - Starting Warehouse Management System v1.0.0
+2026-02-05 23:53:26,283 - devices_api - INFO - devices.py:27 - Device location syncer initialized
+2026-02-05 23:53:26,285 - notification_monitor - INFO - notification_monitor.py:37 - NotificationMonitor initialized
+2026-02-05 23:53:26,721 - main_window - INFO - main_window.py:124 - Dashboard widget loaded successfully
+2026-02-05 23:53:26,730 - devices_api - INFO - devices.py:27 - Device location syncer initialized
+2026-02-05 23:53:26,772 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:53:26,816 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:53:26,828 - main_window - INFO - main_window.py:134 - Device Management widget loaded successfully
+2026-02-05 23:53:26,843 - main_window - INFO - main_window.py:145 - Rack Management widget loaded successfully
+2026-02-05 23:53:26,871 - product_management - INFO - product_management.py:143 - Loaded 0 products from CSV
+2026-02-05 23:53:26,874 - main_window - INFO - main_window.py:155 - Product Management widget loaded successfully
+2026-02-05 23:53:26,998 - main_window - INFO - main_window.py:166 - Task Creation widget loaded successfully
+2026-02-05 23:53:27,005 - devices_api - INFO - devices.py:27 - Device location syncer initialized
+2026-02-05 23:53:27,031 - main_window - INFO - main_window.py:177 - Task Monitor widget loaded successfully
+2026-02-05 23:53:27,058 - user_management - INFO - user_management.py:581 - Refreshing user data...
+2026-02-05 23:53:27,060 - user_management - INFO - user_management.py:603 - Loaded 12 users from CSV
+2026-02-05 23:53:27,069 - main_window - INFO - main_window.py:187 - User Management widget loaded successfully
+2026-02-05 23:53:27,414 - map_management - INFO - map_management.py:64 - Map Management widget initialized
+2026-02-05 23:53:27,479 - main_window - INFO - main_window.py:198 - Map Management widget loaded successfully
+2026-02-05 23:53:27,482 - devices_api - INFO - devices.py:27 - Device location syncer initialized
+2026-02-05 23:53:27,589 - main_window - INFO - main_window.py:209 - Device Tracking widget loaded successfully
+2026-02-05 23:53:27,661 - main_window - INFO - main_window.py:219 - Robot Control widget loaded successfully
+2026-02-05 23:53:29,702 - api_client - WARNING - client.py:80 - Request attempt 1 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:53:31,753 - api_client - WARNING - client.py:80 - Request attempt 2 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:53:33,786 - api_client - WARNING - client.py:80 - Request attempt 3 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:53:33,787 - warehouse_app - INFO - main.py:62 - Main window created successfully
+2026-02-05 23:53:33,842 - warehouse_app - INFO - main.py:170 - Application started successfully
+2026-02-05 23:53:36,238 - main_window - INFO - main_window.py:339 - Refreshed data for Create Task
+2026-02-05 23:53:41,427 - main_window - INFO - main_window.py:339 - Refreshed data for Map Management
+2026-02-05 23:53:56,780 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:53:56,826 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:53:57,674 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:54:06,991 - product_management - INFO - product_management.py:143 - Loaded 0 products from CSV
+2026-02-05 23:54:06,991 - main_window - INFO - main_window.py:339 - Refreshed data for Product Management
+2026-02-05 23:54:08,339 - main_window - INFO - main_window.py:339 - Refreshed data for Create Task
+2026-02-05 23:54:26,777 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:54:26,809 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:54:29,713 - api_client - WARNING - client.py:80 - Request attempt 1 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:54:31,751 - api_client - WARNING - client.py:80 - Request attempt 2 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:54:33,795 - api_client - WARNING - client.py:80 - Request attempt 3 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:54:33,814 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:54:56,794 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:54:56,837 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:54:57,670 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:55:04,019 - task_creation - INFO - task_creation.py:2114 - Pickup stops selected: ['x']
+2026-02-05 23:55:26,802 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:55:26,845 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:55:29,719 - api_client - WARNING - client.py:80 - Request attempt 1 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:55:31,748 - api_client - WARNING - client.py:80 - Request attempt 2 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:55:33,784 - api_client - WARNING - client.py:80 - Request attempt 3 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:55:33,797 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:55:56,797 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:55:56,886 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:55:57,670 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:56:26,799 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:56:26,895 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:56:29,707 - api_client - WARNING - client.py:80 - Request attempt 1 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:56:31,753 - api_client - WARNING - client.py:80 - Request attempt 2 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:56:33,786 - api_client - WARNING - client.py:80 - Request attempt 3 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:56:33,786 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:56:56,796 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:56:56,887 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:56:57,669 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:57:26,873 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:57:27,001 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:57:29,724 - api_client - WARNING - client.py:80 - Request attempt 1 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:57:31,763 - api_client - WARNING - client.py:80 - Request attempt 2 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:57:33,811 - api_client - WARNING - client.py:80 - Request attempt 3 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:57:33,811 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:57:56,800 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:57:56,886 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:57:57,670 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:58:26,789 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:58:26,916 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:58:29,703 - api_client - WARNING - client.py:80 - Request attempt 1 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:58:31,749 - api_client - WARNING - client.py:80 - Request attempt 2 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:58:33,782 - api_client - WARNING - client.py:80 - Request attempt 3 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:58:33,784 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:58:56,801 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:58:56,903 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:58:57,670 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:59:09,564 - main_window - INFO - main_window.py:339 - Refreshed data for Map Management
+2026-02-05 23:59:26,795 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:59:26,828 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:59:29,696 - api_client - WARNING - client.py:80 - Request attempt 1 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:59:31,730 - api_client - WARNING - client.py:80 - Request attempt 2 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:59:33,752 - api_client - WARNING - client.py:80 - Request attempt 3 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-05 23:59:33,800 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-05 23:59:43,731 - csv_handler - INFO - csv_handler.py:252 - Successfully appended row to stops CSV with ID: 22
+2026-02-05 23:59:47,211 - main_window - INFO - main_window.py:339 - Refreshed data for Create Task
+2026-02-05 23:59:50,781 - main_window - INFO - main_window.py:339 - Refreshed data for Task Monitor
+2026-02-05 23:59:52,176 - main_window - INFO - main_window.py:339 - Refreshed data for Map Management
+2026-02-05 23:59:56,644 - main_window - INFO - main_window.py:339 - Refreshed data for Create Task
+2026-02-05 23:59:56,789 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-05 23:59:56,839 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-05 23:59:57,671 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-06 00:00:01,451 - task_creation - INFO - task_creation.py:2114 - Pickup stops selected: []
+2026-02-06 00:00:08,385 - task_creation - INFO - task_creation.py:2114 - Pickup stops selected: ['x']
+2026-02-06 00:00:26,793 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-06 00:00:26,877 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-06 00:00:29,696 - api_client - WARNING - client.py:80 - Request attempt 1 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-06 00:00:31,714 - api_client - WARNING - client.py:80 - Request attempt 2 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-06 00:00:33,732 - api_client - WARNING - client.py:80 - Request attempt 3 failed: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /api/ (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+2026-02-06 00:00:33,733 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-06 00:00:56,856 - device_list - INFO - device_list.py:310 - Refreshing device data...
+2026-02-06 00:00:56,953 - device_list - INFO - device_list.py:330 - Loaded 1 devices from CSV
+2026-02-06 00:00:57,702 - device_location_syncer - INFO - sync_device_locations.py:250 - Sync completed. No location updates needed.
+2026-02-06 00:01:15,676 - main_window - INFO - main_window.py:435 - Application closing

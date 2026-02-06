@@ -855,10 +855,33 @@ class TaskMonitorWidget(QWidget):
             drop_stops = []
 
         # Prefer end_zone, fallback to drop_zone for backward compatibility
+        # Also check for end_stop_id (new approach) and resolve it to zone
         end_zone: str | None = None
-        dz = details.get('end_zone') or details.get('drop_zone') or details.get('drop_zone_id')
-        if dz is not None and str(dz).strip():
-            end_zone = str(dz).strip()
+        
+        # First, try to resolve end_stop_id to a zone
+        end_stop_id = details.get('end_stop_id')
+        if end_stop_id:
+            try:
+                stops = CSVHandler().read_csv('stops')
+                for stop in stops:
+                    if str(stop.get('stop_id')).strip() == str(end_stop_id).strip():
+                        zone_conn_id = stop.get('zone_connection_id')
+                        if zone_conn_id:
+                            zones_data = CSVHandler().read_csv('zones')
+                            for zone_row in zones_data:
+                                if (str(zone_row.get('id')).strip() == str(zone_conn_id).strip() and 
+                                    str(zone_row.get('map_id')).strip() == str(map_id).strip()):
+                                    end_zone = str(zone_row.get('to_zone')).strip()
+                                    break
+                        break
+            except Exception as e:
+                self.logger.warning(f"Could not resolve end_stop_id {end_stop_id} to zone: {e}")
+        
+        # If end_stop_id resolution failed, fall back to end_zone or drop_zone
+        if not end_zone:
+            dz = details.get('end_zone') or details.get('drop_zone') or details.get('drop_zone_id')
+            if dz is not None and str(dz).strip():
+                end_zone = str(dz).strip()
         drop_zone = end_zone  # Keep drop_zone for backward compatibility
 
         return map_id, from_zone, to_zone, zone_path, pickup_stops, pickup_racks, drop_zone, check_stops, drop_stops, end_zone

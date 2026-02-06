@@ -2021,7 +2021,7 @@ class MapManagementWidget(QWidget):
             map_id_str = str(self.selected_map_id)
 
             # Read all existing rows so we can update only this map's entries
-            all_rows = self.csv_handler.read_csv('zone_alignment') or []
+            self.stop_function_combo.addItems(["Pickup", "Check", "Drop", "Charging", "End"])
             # Keep rows for other maps as-is
             retained = [r for r in all_rows if str(r.get('map_id')) != map_id_str]
 
@@ -3220,9 +3220,9 @@ class MapManagementWidget(QWidget):
         form_layout.addRow("Stop Type:", self.stop_type_combo)
 
         # Stop function (logical operation)
-        # This is used later in task creation to show only the right stops under Pickup/Check/Drop.
+        # This is used later in task creation to show only the right stops under Pickup/Check/Drop/Charging/End.
         self.stop_function_combo = QComboBox()
-        self.stop_function_combo.addItems(["Pickup", "Check", "Drop", "Charging"])
+        self.stop_function_combo.addItems(["Pickup", "Check", "Drop", "Charging", "End"])
         self.stop_function_combo.currentTextChanged.connect(self.validate_stop_inputs)
         self.apply_combo_style(self.stop_function_combo)
         form_layout.addRow("Stop Function:", self.stop_function_combo)

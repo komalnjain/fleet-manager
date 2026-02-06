@@ -363,14 +363,53 @@ class TaskCreationWidget(QWidget):
         self.drop_stop_list.itemSelectionChanged.connect(self.on_drop_stop_selection_changed)
         layout.addRow("Drop Stops:", self.drop_stop_list)
 
-        # End Zone dropdown (renamed from Drop Zone, single-select of all zones in the pickup map)
+        # End Stop list (single-select) - show only stops created with stop_function='end'
+        self.end_stop_list = QListWidget()
+        self.end_stop_list.setMinimumHeight(100)
+        self.end_stop_list.setSelectionMode(QListWidget.SingleSelection)
+        self.end_stop_list.setEnabled(False)
+        self.end_stop_list.setStyleSheet("""
+            QListWidget {
+                background-color: #2d2d2d;
+                color: white;
+                border: 1px solid #555555;
+                border-radius: 4px;
+                padding: 5px;
+            }
+            QListWidget::item:selected {
+                background-color: #0078D4;
+                color: white;
+            }
+        """)
+        self.end_stop_list.itemSelectionChanged.connect(self.check_form_completion)
+        layout.addRow("End Stop *:", self.end_stop_list)
+
+        # Charging Stops list (show all stops with stop_function='charging')
+        self.charging_stops_list = QListWidget()
+        self.charging_stops_list.setMinimumHeight(100)
+        self.charging_stops_list.setSelectionMode(QListWidget.MultiSelection)
+        self.charging_stops_list.setEnabled(False)
+        self.charging_stops_list.setStyleSheet("""
+            QListWidget {
+                background-color: #2d2d2d;
+                color: white;
+                border: 1px solid #555555;
+                border-radius: 4px;
+                padding: 5px;
+            }
+            QListWidget::item:selected {
+                background-color: #0078D4;
+                color: white;
+            }
+        """)
+        self.charging_stops_list.itemSelectionChanged.connect(self.check_form_completion)
+        layout.addRow("Charging Stops:", self.charging_stops_list)
+
+        # Keep a hidden end_zone_combo for backward compatibility (not shown)
         self.end_zone_combo = QComboBox()
-        self.end_zone_combo.setMinimumHeight(35)
         self.end_zone_combo.addItem("Select End Zone", "")
         self.end_zone_combo.setEnabled(False)
-        self.end_zone_combo.currentIndexChanged.connect(self.check_form_completion)
-        self.apply_combo_style(self.end_zone_combo)
-        layout.addRow("End Zone *:", self.end_zone_combo)
+        self.end_zone_combo.setVisible(False)
 
         # Upload CSV file button
         upload_layout = QHBoxLayout()
@@ -1325,10 +1364,16 @@ class TaskCreationWidget(QWidget):
         task_type = self.task_type_combo.currentData()
         
         if task_type == 'picking':
-            # For picking: map, at least one pickup stop, and end zone must be selected
+            # For picking: map, at least one pickup stop, and end stop must be selected
             # Check stops optional; Drop stops required if map defines any drop stops
             has_map = hasattr(self, 'pickup_map_combo') and self.pickup_map_combo.currentIndex() > 0
-            has_end_zone = hasattr(self, 'end_zone_combo') and self.end_zone_combo.currentIndex() > 0
+            has_end_stop = False
+            if hasattr(self, 'end_stop_list'):
+                for i in range(self.end_stop_list.count()):
+                    item = self.end_stop_list.item(i)
+                    if item and item.isSelected():
+                        has_end_stop = True
+                        break
             has_pickup_stops = False
             if hasattr(self, 'pickup_stop_list'):
                 for i in range(self.pickup_stop_list.count()):
@@ -1345,10 +1390,10 @@ class TaskCreationWidget(QWidget):
                     if item and item.isSelected():
                         has_drop_stops = True
                         break
-            # End zone should be enabled if pickup stops are selected
-            if has_pickup_stops and hasattr(self, 'end_zone_combo'):
-                self.end_zone_combo.setEnabled(True)
-            task_details_filled = has_map and has_pickup_stops and has_drop_stops and has_end_zone
+            # End stop should be enabled if pickup stops are selected
+            if has_pickup_stops and hasattr(self, 'end_stop_list'):
+                self.end_stop_list.setEnabled(True)
+            task_details_filled = has_map and has_pickup_stops and has_drop_stops and has_end_stop
         elif task_type == 'storing':
             # For storing: map, from zone, to zone, and end zone must be selected
             task_details_filled = (
@@ -1412,7 +1457,7 @@ class TaskCreationWidget(QWidget):
                     if task_type == 'auditing':
                         missing_steps.append("Auditing Map, End Zone")
                     elif task_type == 'picking':
-                        missing_steps.append("Pickup Map, Pick Up Stops, End Zone")
+                        missing_steps.append("Pickup Map, Pick Up Stops, End Stop")
                     elif task_type == 'charging':
                         missing_steps.append("Charging Map, Charging Station")
                     else:
@@ -1562,10 +1607,18 @@ class TaskCreationWidget(QWidget):
                     QMessageBox.warning(self, "Validation Error", "Select at least one Drop Stop")
                     self.drop_stop_list.setFocus()
                     return False
-            # End zone
-            if not self.end_zone_combo.currentData():
-                QMessageBox.warning(self, "Validation Error", "End Zone is required")
-                self.end_zone_combo.setFocus()
+            # End stop instead of end zone - require a selected end stop
+            has_end = False
+            if hasattr(self, 'end_stop_list'):
+                for i in range(self.end_stop_list.count()):
+                    item = self.end_stop_list.item(i)
+                    if item and item.isSelected():
+                        has_end = True
+                        break
+            if not has_end:
+                QMessageBox.warning(self, "Validation Error", "End Stop is required")
+                if hasattr(self, 'end_stop_list'):
+                    self.end_stop_list.setFocus()
                 return False
 
         elif task_type == 'storing':
@@ -1722,14 +1775,38 @@ class TaskCreationWidget(QWidget):
             all_stops = pickup_stops + check_stops + drop_stops
             task_data['stop_ids'] = ','.join(all_stops) if all_stops else ''
 
-            # Capture End Zone (renamed from Drop Zone)
-            end_zone_id = self.end_zone_combo.currentData() if hasattr(self, 'end_zone_combo') else ''
-            end_zone_name = self.end_zone_combo.currentText() if hasattr(self, 'end_zone_combo') else ''
-            if end_zone_id:
-                task_data['zone_ids'] = str(end_zone_id)
-                task_data['task_details']['end_zone'] = str(end_zone_id)
-            if end_zone_name:
-                task_data['task_details']['end_zone_name'] = end_zone_name
+            # Capture End Stop (renamed from Drop Zone) - this stop_id is used for CALL,END
+            end_stop_ids = []
+            end_stop_names = []
+            if hasattr(self, 'end_stop_list'):
+                for i in range(self.end_stop_list.count()):
+                    item = self.end_stop_list.item(i)
+                    if item and item.isSelected():
+                        sid = item.data(Qt.UserRole)
+                        if sid:
+                            end_stop_ids.append(str(sid))
+                            end_stop_names.append(item.text())
+            # store first selected end stop (single-select expected)
+            if end_stop_ids:
+                task_data['task_details']['end_stop_id'] = end_stop_ids[0]
+                task_data['task_details']['end_stop_name'] = end_stop_names[0]
+            else:
+                task_data['task_details']['end_stop_id'] = ''
+                task_data['task_details']['end_stop_name'] = ''
+            
+            # Capture Charging Stops
+            charging_stops = []
+            charging_stop_names = []
+            if hasattr(self, 'charging_stops_list'):
+                for i in range(self.charging_stops_list.count()):
+                    item = self.charging_stops_list.item(i)
+                    if item and item.isSelected():
+                        stop_id = item.data(Qt.UserRole)
+                        if stop_id:
+                            charging_stops.append(str(stop_id))
+                            charging_stop_names.append(item.text())
+            task_data['task_details']['charging_stops'] = charging_stops
+            task_data['task_details']['charging_stop_names'] = charging_stop_names
         
         elif task_type == 'charging':
             # Add charging-specific data
@@ -1944,20 +2021,21 @@ class TaskCreationWidget(QWidget):
         return len(busy) == 0
 
     def on_map_selection_changed(self, index):
-        """Handle pickup map selection change and populate Pick Up Stops, Check Stops, Drop Stops, and End Zone."""
-        # Clear existing stops and end zone
+        """Handle pickup map selection change and populate Pick Up Stops, Check Stops, Drop Stops, End Stop, and Charging Stops."""
+        # Clear existing stops and end stop
         self.pickup_stop_list.clear()
         self.check_stop_list.clear()
         self.drop_stop_list.clear()
-        if hasattr(self, 'end_zone_combo'):
-            self.end_zone_combo.clear()
-            self.end_zone_combo.addItem("Select End Zone", "")
-            self.end_zone_combo.setEnabled(False)
+        self.charging_stops_list.clear()
+        if hasattr(self, 'end_stop_list'):
+            self.end_stop_list.clear()
+            self.end_stop_list.setEnabled(False)
         
         # Disable all stop lists initially
         self.pickup_stop_list.setEnabled(False)
         self.check_stop_list.setEnabled(False)
         self.drop_stop_list.setEnabled(False)
+        self.charging_stops_list.setEnabled(False)
 
         # Reset distance calculations
         self.current_map_distance = 0
@@ -1972,31 +2050,11 @@ class TaskCreationWidget(QWidget):
             selected_map_id = self.pickup_map_combo.currentData()
 
             try:
-                # Populate End Zone combo with all zones from zones.csv for this map
-                zones = self.csv_handler.read_csv('zones')
-                unique_zones = set()
-                for zone_data in zones:
-                    map_id = zone_data.get('map_id', '')
-                    if str(map_id) == str(selected_map_id):
-                        from_zone = zone_data.get('from_zone', '')
-                        to_zone = zone_data.get('to_zone', '')
-                        if from_zone:
-                            unique_zones.add(str(from_zone))
-                        if to_zone:
-                            unique_zones.add(str(to_zone))
-
-                def _zone_key(z):
-                    s = str(z)
-                    return (0, int(s)) if s.isdigit() else (1, s)
-
-                for zone in sorted(unique_zones, key=_zone_key):
-                    self.end_zone_combo.addItem(zone, zone)
-                # End zone enabled after drop stops are selected
-                
                 # Enable all stop lists (they will be populated by stop_function)
                 self.pickup_stop_list.setEnabled(True)
                 self.check_stop_list.setEnabled(True)
                 self.drop_stop_list.setEnabled(True)
+                self.charging_stops_list.setEnabled(True)
 
                 stops = self.csv_handler.read_csv('stops')
                 racks = self.csv_handler.read_csv('racks')
@@ -2020,8 +2078,8 @@ class TaskCreationWidget(QWidget):
                             continue
                         racks_by_stop.setdefault(sid, []).append(r)
 
-                # Populate stops by stop_function (pickup/check/drop). Default is 'pickup' for older rows.
-                added_pickup, added_check, added_drop = set(), set(), set()
+                # Populate stops by stop_function and end stops
+                added_pickup, added_check, added_drop, added_charging, added_end = set(), set(), set(), set(), set()
                 for stop_data in stops:
                     if str(stop_data.get('map_id', '')) != str(selected_map_id):
                         continue
@@ -2030,8 +2088,12 @@ class TaskCreationWidget(QWidget):
                         continue
                     stop_name = stop_data.get('name', stop_id)
                     sf = str(stop_data.get('stop_function') or 'pickup').strip().lower()
-                    item = QListWidgetItem(f"{stop_name} ({stop_id})")
+                    
+                    # Create item for lists
+                    display_text = f"{stop_name} ({stop_id})"
+                    item = QListWidgetItem(display_text)
                     item.setData(Qt.UserRole, stop_id)
+                    
                     if sf == 'pickup':
                         if stop_id in added_pickup:
                             continue
@@ -2040,22 +2102,43 @@ class TaskCreationWidget(QWidget):
                     elif sf == 'check':
                         if stop_id in added_check:
                             continue
-                        self.check_stop_list.addItem(item)
+                        item_copy = QListWidgetItem(display_text)
+                        item_copy.setData(Qt.UserRole, stop_id)
+                        self.check_stop_list.addItem(item_copy)
                         added_check.add(stop_id)
                     elif sf == 'drop':
                         if stop_id in added_drop:
                             continue
-                        self.drop_stop_list.addItem(item)
+                        item_copy = QListWidgetItem(display_text)
+                        item_copy.setData(Qt.UserRole, stop_id)
+                        self.drop_stop_list.addItem(item_copy)
                         added_drop.add(stop_id)
-                    else:
-                        # ignore charging/unknown here (charging is auto-triggered, not user-selected)
-                        pass
+                    elif sf == 'charging':
+                        if stop_id in added_charging:
+                            continue
+                        item_copy = QListWidgetItem(display_text)
+                        item_copy.setData(Qt.UserRole, stop_id)
+                        self.charging_stops_list.addItem(item_copy)
+                        added_charging.add(stop_id)
+                    elif sf == 'end':
+                        if stop_id in added_end:
+                            continue
+                        item_copy = QListWidgetItem(display_text)
+                        item_copy.setData(Qt.UserRole, stop_id)
+                        self.end_stop_list.addItem(item_copy)
+                        added_end.add(stop_id)
 
-                # If there are no check/drop stops defined, keep those lists disabled
+                # If there are no check/drop/charging stops defined, keep those lists disabled
                 if self.check_stop_list.count() == 0:
                     self.check_stop_list.setEnabled(False)
                 if self.drop_stop_list.count() == 0:
                     self.drop_stop_list.setEnabled(False)
+                if self.charging_stops_list.count() == 0:
+                    self.charging_stops_list.setEnabled(False)
+
+                # Enable end stop list only if it has entries
+                if self.end_stop_list.count() > 0:
+                    self.end_stop_list.setEnabled(True)
                 
                 # Ensure pickup stop selection handler is connected
                 try:
@@ -2064,7 +2147,7 @@ class TaskCreationWidget(QWidget):
                     pass
                 self.pickup_stop_list.itemSelectionChanged.connect(self.on_pickup_stop_selection_changed)
             except Exception as e:
-                self.logger.error(f"Error loading zones/stops for pickup map: {e}")
+                self.logger.error(f"Error loading stops for pickup map: {e}")
 
         # Check form completion after map selection
         self.check_form_completion()
@@ -2075,11 +2158,14 @@ class TaskCreationWidget(QWidget):
         self.logger.info(f"Pickup stops selected: {selected_pickup_stops}")
         
         if selected_pickup_stops:
-            # Enable end zone
-            self.end_zone_combo.setEnabled(True)
+            # Enable end stop list if present
+            if hasattr(self, 'end_stop_list') and self.end_stop_list.count() > 0:
+                self.end_stop_list.setEnabled(True)
         else:
-            # Disable end zone if no pickup stops selected
-            self.end_zone_combo.setEnabled(False)
+            # Disable end stop list if no pickup stops selected
+            if hasattr(self, 'end_stop_list'):
+                self.end_stop_list.setEnabled(False)
+        
         
         self.check_form_completion()
     
@@ -2094,10 +2180,12 @@ class TaskCreationWidget(QWidget):
         
         # Enable end zone if pickup stops are selected (drop stops are optional)
         if selected_pickup_stops:
-            # Enable end zone (required, enabled after pickup stops are selected)
-            self.end_zone_combo.setEnabled(True)
+            # Enable end stop list if present
+            if hasattr(self, 'end_stop_list') and self.end_stop_list.count() > 0:
+                self.end_stop_list.setEnabled(True)
         else:
-            self.end_zone_combo.setEnabled(False)
+            if hasattr(self, 'end_stop_list'):
+                self.end_stop_list.setEnabled(False)
         
         self.check_form_completion()
     
