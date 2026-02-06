@@ -147,6 +147,20 @@
         "direction": "south",
         "connection_id": "55",
         "is_active": true
+      },
+      {
+        "from_zone": "1",
+        "to_zone": "2",
+        "direction": "north",
+        "connection_id": "63",
+        "is_active": true
+      },
+      {
+        "from_zone": "1",
+        "to_zone": "6",
+        "direction": "south",
+        "connection_id": "67",
+        "is_active": true
       }
     ],
     "2": [
@@ -247,6 +261,13 @@
         "direction": "east",
         "connection_id": "56",
         "is_active": true
+      },
+      {
+        "from_zone": "2",
+        "to_zone": "3",
+        "direction": "east",
+        "connection_id": "64",
+        "is_active": true
       }
     ],
     "3": [
@@ -304,6 +325,13 @@
         "to_zone": "4",
         "direction": "south",
         "connection_id": "57",
+        "is_active": true
+      },
+      {
+        "from_zone": "3",
+        "to_zone": "4",
+        "direction": "south",
+        "connection_id": "65",
         "is_active": true
       }
     ],
@@ -386,6 +414,13 @@
         "direction": "east",
         "connection_id": "58",
         "is_active": true
+      },
+      {
+        "from_zone": "4",
+        "to_zone": "1",
+        "direction": "west",
+        "connection_id": "66",
+        "is_active": true
       }
     ],
     "6": [
@@ -442,7 +477,7 @@
       "current_zone": "1",
       "locked_direction": "north",
       "target_zone": null,
-      "lock_timestamp": 1770382017.118655,
+      "lock_timestamp": 1770407705.3890445,
       "turn_type": null,
       "device_id": "rob3",
       "is_transitioning": false,
@@ -451,5 +486,5 @@
       "last_turn_zone": null
     }
   },
-  "last_saved": 1770384279.7384834
+  "last_saved": 1770408635.4585257
 }

@@ -395,7 +395,9 @@ def plan_and_write_path(
     fs, ts = _read_device_speeds(device_id)
     vs = _read_device_vertical_speed(device_id)
 
-    # Build stop_operations mapping: stop_id -> operation ('pickup', 'check', 'drop', 'charging', 'end')
+    # Build stop_operations mapping: stop_id -> operation ('pickup', 'check', 'drop', 'end')
+    # Note: charging stops are NOT added here - they're called conditionally from END logic
+    # Charging stops are passed separately to ensure CHARGING label section is added
     stop_operations: Dict[str, str] = {}
     if pickup_stops:
         for stop_id in pickup_stops:
@@ -406,9 +408,7 @@ def plan_and_write_path(
     if drop_stops:
         for stop_id in drop_stops:
             stop_operations[str(stop_id)] = 'drop'
-    if charging_stops:
-        for stop_id in charging_stops:
-            stop_operations[str(stop_id)] = 'charging'
+    # Charging stops are NOT added to stop_operations - they're handled in END logic conditionally
     # Add end_stop_id to stop_operations so CALL,END is generated at that stop
     if end_stop_id:
         stop_operations[str(end_stop_id)] = 'end'
@@ -456,7 +456,12 @@ def plan_and_write_path(
     if task_type and str(task_type).lower() == 'charging':
         cmds.append(('CALL', 'CHARGING'))
 
-    rows = serialize_commands_to_csv_rows(cmds, device_id, task_type=task_type)
+    # Pass charging_stops, end_stop_id, and map_id info to serialize_commands_to_csv_rows for CHARGING label section
+    # This allows CHARGING logic to generate navigation path from END stop to charging stop
+    rows = serialize_commands_to_csv_rows(
+        cmds, device_id, task_type=task_type, charging_stops=charging_stops,
+        end_stop_id=end_stop_id, map_id=map_id, end_zone=target_end_zone
+    )
 
     out_dir = output_dir or DEVICE_LOGS_DIR
     os.makedirs(out_dir, exist_ok=True)

@@ -39,6 +39,11 @@ import os
 from dataclasses import dataclass
 from typing import Dict, List, Tuple, Optional, Any
 
+# Import for reading CSV files
+DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
+STOPS_CSV = os.path.join(DATA_DIR, "stops.csv")
+ZONES_CSV = os.path.join(DATA_DIR, "zones.csv")
+
 # Types
 ZoneId = str
 Direction = str  # 'north'|'south'|'east'|'west'
@@ -268,10 +273,11 @@ def generate_edge_commands(
     """
     commands: List[Tuple[Any, ...]] = []
 
-    # Turn if needed before entering edge direction
+    # Turn if needed before entering edge direction.
+    # Do not add ALIGN here: the caller already adds ALIGN at the previous segment's to_zone
+    # (which equals this edge's from_zone), so adding ALIGN(from_zone) again would duplicate.
     turn_cmd, deg = compute_turn(current_direction, edge.direction)
     if turn_cmd and deg:
-        commands.append(('ALIGN', str(edge.from_zone), '0', '0'))
         commands.append((turn_cmd, deg, 'DEG'))
         current_direction = edge.direction  # orientation after the turn
 
@@ -349,6 +355,9 @@ def generate_edge_commands(
                 commands.append(('CALL', 'CHARGING'))
             elif operation == 'end':
                 commands.append(('CALL', 'END'))
+                # CRITICAL: Stop processing after END - no more commands should be generated
+                # Don't finish remaining forward distance - END is the final stop
+                return commands, current_direction
         elif task_type:
             # Fallback to task_type-based logic
             tt = str(task_type).lower()
@@ -390,6 +399,8 @@ def generate_edge_commands(
                 commands.append(('CALL', 'AUDIT'))
 
     # Finish remaining forward distance to end of edge
+    # BUT: If we already called END, we should have returned earlier
+    # This ensures we don't add unnecessary movement after END
     forward_to(total_m)
 
     return commands, current_direction
@@ -448,7 +459,12 @@ def generate_path_commands(
     offset_m_for_first_edge = initial_offset_m
 
     last_arrival_zone: Optional[str] = None
+    end_reached = False  # Flag to track if END has been called
     for i, (fz, tz) in enumerate(zone_sequence):
+        # Stop processing if END has been reached
+        if end_reached:
+            break
+            
         if i == 0 and initial_offset_m <= 0.0:
             try:
                 cmds.append(_align_cmd(fz))
@@ -464,6 +480,9 @@ def generate_path_commands(
             # turn path into pair edges
             sub_pairs = list(zip(path[:-1], path[1:]))
             for j, (sf, st) in enumerate(sub_pairs):
+                # Stop if END reached
+                if end_reached:
+                    break
                 sub_edge = conn_lookup.get((sf, st))
                 if not sub_edge:
                     continue
@@ -479,6 +498,12 @@ def generate_path_commands(
                     stop_operations=stop_operations,
                 )
                 cmds.extend(seg_cmds)
+                # Check if END was called in this segment
+                if any(isinstance(cmd, (tuple, list)) and len(cmd) >= 2 and 
+                       str(cmd[0]).upper() == 'CALL' and str(cmd[1]).upper() == 'END' 
+                       for cmd in seg_cmds):
+                    end_reached = True
+                    break
                 last_arrival_zone = sub_edge.to_zone
                 try:
                     is_last_overall_leg = (i == len(zone_sequence) - 1) and (j == len(sub_pairs) - 1)
@@ -500,6 +525,12 @@ def generate_path_commands(
                 stop_operations=stop_operations,
             )
             cmds.extend(seg_cmds)
+            # Check if END was called in this segment
+            if any(isinstance(cmd, (tuple, list)) and len(cmd) >= 2 and 
+                   str(cmd[0]).upper() == 'CALL' and str(cmd[1]).upper() == 'END' 
+                   for cmd in seg_cmds):
+                end_reached = True
+                break  # Stop processing further edges
             offset_m_for_first_edge = 0.0
             last_arrival_zone = edge.to_zone
             try:
@@ -519,9 +550,14 @@ def generate_path_commands(
                         # Only emit CALL,END if no end_stop_id is specified
                         if not end_stop_id:
                             cmds.append(('CALL', 'END'))
+                            end_reached = True
             except Exception:
                 pass
 
+    # If END was reached, don't add any more commands
+    if end_reached:
+        return cmds
+    
     # Append final ALIGN at the last arrival zone, if available
     # Skip for tasks with end_zone - ALIGN was already added before END
     if last_arrival_zone is not None:
@@ -605,7 +641,15 @@ def generate_path_commands(
     return aug_cmds
 
 
-def serialize_commands_to_csv_rows(cmds: List[Tuple[Any, ...]], device_id: Optional[str] = None, task_type: Optional[str] = None) -> List[List[str]]:
+def serialize_commands_to_csv_rows(
+    cmds: List[Tuple[Any, ...]], 
+    device_id: Optional[str] = None, 
+    task_type: Optional[str] = None, 
+    charging_stops: Optional[List[str]] = None,
+    end_stop_id: Optional[str] = None,
+    map_id: Optional[str] = None,
+    end_zone: Optional[str] = None
+) -> List[List[str]]:
     rows: List[List[str]] = [["command", "value", "unit"]]
     # Ensure first command row is HOMING,ALL as requested
     rows.append(["HOMING", "ALL"])
@@ -706,13 +750,38 @@ def serialize_commands_to_csv_rows(cmds: List[Tuple[Any, ...]], device_id: Optio
                             rows.append(line.split(','))
             except Exception:
                 pass
+        else:
+            # Default END logic: check battery and conditionally go to charging
+            # If battery < 20%, CALL CHARGING, else UPDATE_STATUS to IDLE and RETURN
+            rows.append(["CHECK_BATTERY", "20"])
+            rows.append(["IF_LESS_THAN", "CALL", "CHARGING"])
+            rows.append(["ELSE", "UPDATE_STATUS", "IDLE"])
+            rows.append(["RETURN"])
+    else:
+        # If no END_Logic.csv file exists, add default logic
+        rows.append(["CHECK_BATTERY", "20"])
+        rows.append(["IF_LESS_THAN", "CALL", "CHARGING"])
+        rows.append(["ELSE", "UPDATE_STATUS", "IDLE"])
+        rows.append(["RETURN"])
 
-    rows.append(["RETURN"])
+    # Don't add extra RETURN here - it's already in the logic file or default logic
 
-    # Add CHARGING label section if needed (either charging task_type or CALL,CHARGING exists in cmds)
-    if tt == 'charging' or has_charging_call:
+    # Always add CHARGING label section for picking tasks (will be called conditionally from END logic)
+    # Also add if charging task_type or CALL,CHARGING exists in cmds or charging_stops are provided
+    should_add_charging = (tt == 'picking' or tt == 'charging' or has_charging_call or 
+                          (charging_stops and len(charging_stops) > 0))
+    if should_add_charging:
         rows.append([])  # Blank line
         rows.append(["LABEL", "CHARGING"])
+        
+        # Always generate navigation path from END stop to charging stop FIRST
+        # This ensures robot moves to charging location before executing CHARGING logic
+        charging_nav_commands = _generate_charging_navigation(
+            end_stop_id, charging_stops, map_id, end_zone
+        )
+        if charging_nav_commands:
+            rows.extend(charging_nav_commands)
+        
         if device_id:
             charging_logic_path = os.path.join(
                 os.path.dirname(os.path.dirname(__file__)),
@@ -727,9 +796,189 @@ def serialize_commands_to_csv_rows(cmds: List[Tuple[Any, ...]], device_id: Optio
                                 rows.append(line.split(','))
                 except Exception:
                     pass
-        rows.append(["RETURN"])
+            else:
+                # Default CHARGING logic: wait until 100% charged
+                rows.append(["UPDATE_STATUS", "CHARGING"])
+                rows.append(["WAIT_BATTERY", "100"])
+                rows.append(["UPDATE_STATUS", "IDLE"])
+                rows.append(["RETURN"])
+        else:
+            # Default CHARGING logic if no device_id
+            rows.append(["UPDATE_STATUS", "CHARGING"])
+            rows.append(["WAIT_BATTERY", "100"])
+            rows.append(["UPDATE_STATUS", "IDLE"])
+            rows.append(["RETURN"])
+        # Don't add extra RETURN here - it's already in the logic file or default logic
 
     return rows
+
+
+def _read_csv(path: str) -> List[Dict[str, str]]:
+    """Helper function to read CSV files."""
+    rows: List[Dict[str, str]] = []
+    if not os.path.exists(path):
+        return rows
+    with open(path, "r", newline="") as f:
+        reader = csv.DictReader(f)
+        for r in reader:
+            rows.append(r)
+    return rows
+
+
+def _generate_charging_navigation(
+    end_stop_id: Optional[str],
+    charging_stops: Optional[List[str]],
+    map_id: Optional[str],
+    end_zone: Optional[str]
+) -> List[List[str]]:
+    """
+    Generate navigation commands to move from END stop to charging stop.
+    Returns list of command rows [command, value, unit] for navigation.
+    Uses generate_path_commands to create actual movement commands.
+    """
+    nav_commands = []
+    
+    if not charging_stops or not map_id:
+        return nav_commands
+    
+    try:
+        # Get first charging stop
+        charging_stop_id = charging_stops[0] if charging_stops else None
+        if not charging_stop_id:
+            return nav_commands
+        
+        # Read stops and zones
+        stops_rows = _read_csv(STOPS_CSV)
+        zones_rows = _read_csv(ZONES_CSV)
+        
+        # Find end stop zone (where robot currently is after CALL,END)
+        end_stop_zone = None
+        end_stop_conn_id = None
+        if end_stop_id:
+            for stop in stops_rows:
+                if (str(stop.get('stop_id')) == str(end_stop_id) and 
+                    str(stop.get('map_id')) == str(map_id)):
+                    end_stop_conn_id = stop.get('zone_connection_id')
+                    for zone in zones_rows:
+                        if (str(zone.get('id')) == str(end_stop_conn_id) and
+                            str(zone.get('map_id')) == str(map_id)):
+                            end_stop_zone = zone.get('to_zone')
+                            break
+                    break
+        
+        # Fallback to end_zone if end_stop_id not found
+        if not end_stop_zone and end_zone:
+            end_stop_zone = end_zone
+        
+        # Find charging stop zone and connection (where robot needs to go)
+        charging_stop_zone = None
+        charging_conn_id = None
+        charging_from_zone = None
+        for stop in stops_rows:
+            if (str(stop.get('stop_id')) == str(charging_stop_id) and 
+                str(stop.get('map_id')) == str(map_id)):
+                charging_conn_id = stop.get('zone_connection_id')
+                for zone in zones_rows:
+                    if (str(zone.get('id')) == str(charging_conn_id) and
+                        str(zone.get('map_id')) == str(map_id)):
+                        charging_from_zone = zone.get('from_zone')
+                        charging_stop_zone = zone.get('to_zone')
+                        break
+                break
+        
+        # If we have both zones and they're different, generate navigation path
+        if end_stop_zone and charging_stop_zone and end_stop_zone != charging_stop_zone:
+            # Build graph for A* pathfinding
+            graph = build_graph_from_zones(zones_rows, str(map_id))
+            
+            # Find path using A*
+            path_zones = astar_path(graph, str(end_stop_zone), str(charging_stop_zone))
+            
+            if path_zones and len(path_zones) >= 2:
+                # Create zone_sequence from path
+                zone_sequence = list(zip(path_zones[:-1], path_zones[1:]))
+                
+                # Generate actual navigation commands using generate_path_commands
+                # We need to get stops_by_conn for the charging stop
+                stops_by_conn = load_stops(stops_rows, str(map_id))
+                
+                # Generate commands for the path to charging stop
+                charging_cmds = generate_path_commands(
+                    graph=graph,
+                    zones_rows=zones_rows,
+                    stops_by_conn=stops_by_conn,
+                    zone_sequence=zone_sequence,
+                    initial_direction='north',  # Default, could be improved
+                    initial_offset_m=0.0,
+                    task_type=None,
+                    zone_alignment=None,
+                    selected_racks_by_stop=None,
+                    drop_zone=None,
+                    end_zone=charging_stop_zone,
+                    end_stop_id=None,  # Don't add CALL,END here
+                    stop_operations={str(charging_stop_id): 'charging'},  # Mark charging stop
+                    map_id=str(map_id),
+                )
+                
+                # Convert commands to CSV rows (skip HOMING if present)
+                for cmd in charging_cmds:
+                    if isinstance(cmd, (tuple, list)):
+                        cmd_str = [str(x) for x in cmd]
+                        # Skip CALL,CHARGING if present (we'll add it after navigation)
+                        if len(cmd_str) >= 2 and cmd_str[0].upper() == 'CALL' and cmd_str[1].upper() == 'CHARGING':
+                            continue
+                        nav_commands.append(cmd_str)
+                    else:
+                        nav_commands.append([str(cmd)])
+        
+        # If charging stop is on the same zone connection as end stop (same edge)
+        if end_stop_conn_id and charging_conn_id and str(end_stop_conn_id) == str(charging_conn_id):
+            # Same edge - need to move along the edge to reach charging stop
+            # Find distance difference between stops
+            end_stop_dist = None
+            charging_stop_dist = None
+            for stop in stops_rows:
+                if (str(stop.get('stop_id')) == str(end_stop_id) and 
+                    str(stop.get('map_id')) == str(map_id)):
+                    try:
+                        end_stop_dist = float(stop.get('distance_from_start', 0) or 0)
+                    except:
+                        pass
+                if (str(stop.get('stop_id')) == str(charging_stop_id) and 
+                    str(stop.get('map_id')) == str(map_id)):
+                    try:
+                        charging_stop_dist = float(stop.get('distance_from_start', 0) or 0)
+                    except:
+                        pass
+            
+            if end_stop_dist is not None and charging_stop_dist is not None:
+                dist_diff = charging_stop_dist - end_stop_dist  # Can be positive or negative
+                if abs(dist_diff) > 0.001:  # If there's a meaningful distance difference
+                    # Get zone connection info for alignment
+                    for zone in zones_rows:
+                        if (str(zone.get('id')) == str(charging_conn_id) and
+                            str(zone.get('map_id')) == str(map_id)):
+                            # Add alignment to the zone connection
+                            # ALIGN should use zone ids, not connection ids
+                            align_zone = charging_from_zone or charging_stop_zone
+                            if align_zone is not None:
+                                nav_commands.append(["ALIGN", str(align_zone), "0", "0"])
+                            # Add forward command (convert meters to mm)
+                            nav_commands.append(["F", str(int(abs(dist_diff) * 1000)), "MM"])
+                            break
+        elif end_stop_zone == charging_stop_zone:
+            # Different edges but same zone - might need alignment to charging connection
+            if charging_stop_zone is not None:
+                # ALIGN should use zone ids, not connection ids
+                nav_commands.append(["ALIGN", str(charging_stop_zone), "0", "0"])
+    
+    except Exception as e:
+        # If navigation generation fails, add a comment (but don't break the path)
+        import traceback
+        nav_commands.append(["#", "ERROR", "Could", "not", "generate", "charging", "navigation:", str(e)])
+        nav_commands.append(["#", "Traceback:", traceback.format_exc()])
+    
+    return nav_commands
 
 
 def write_commands_csv(path: str, rows: List[List[str]]):
