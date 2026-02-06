@@ -590,6 +590,7 @@ def serialize_commands_to_csv_rows(cmds: List[Tuple[Any, ...]], device_id: Optio
             rows.append([str(item)])
     
     # Add blank line and LABEL sections at the end
+    rows.append(["CALL", "END"])
     rows.append([])  # Blank line
 
     tt = str(task_type).lower() if task_type else ""
