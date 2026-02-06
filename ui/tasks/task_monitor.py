@@ -857,6 +857,7 @@ class TaskMonitorWidget(QWidget):
         # Prefer end_zone, fallback to drop_zone for backward compatibility
         # Also check for end_stop_id (new approach) and resolve it to zone
         end_zone: str | None = None
+        end_stop_id: str | None = None
         
         # First, try to resolve end_stop_id to a zone
         end_stop_id = details.get('end_stop_id')
@@ -884,7 +885,7 @@ class TaskMonitorWidget(QWidget):
                 end_zone = str(dz).strip()
         drop_zone = end_zone  # Keep drop_zone for backward compatibility
 
-        return map_id, from_zone, to_zone, zone_path, pickup_stops, pickup_racks, drop_zone, check_stops, drop_stops, end_zone
+        return map_id, from_zone, to_zone, zone_path, pickup_stops, pickup_racks, drop_zone, check_stops, drop_stops, end_zone, end_stop_id
 
     def generate_path_planning_for_selected_task(self):
         """Generate and write path commands for the selected task/device."""
@@ -915,6 +916,7 @@ class TaskMonitorWidget(QWidget):
                 check_stops,
                 drop_stops,
                 end_zone,
+                end_stop_id,
             ) = self._parse_task_map_and_path(self.selected_task)
 
             if not map_id:
@@ -1015,9 +1017,10 @@ class TaskMonitorWidget(QWidget):
                                 all_stops_ordered.extend([(s, 'check') for s in check_stops])
                             if drop_stops:
                                 all_stops_ordered.extend([(s, 'drop') for s in drop_stops])
-                            if charging_stop_ids:
-                                # Visit charging stop at the end (before end_zone)
-                                all_stops_ordered.extend([(charging_stop_ids[0], 'charging')])
+                            
+                            # Add end_stop_id to zone_sequence so CALL,END is generated
+                            if end_stop_id and end_stop_id in stop_to_zone_conn:
+                                all_stops_ordered.append((end_stop_id, 'end'))
                             
                             # Build zone sequence visiting each stop
                             visited_edges = set()
@@ -1051,19 +1054,36 @@ class TaskMonitorWidget(QWidget):
                                         visited_edges.add(edge_key)
                                         last_zone = to_z
                             
-                            # Finally, go to end zone if not already there
+                            # Finally, go to end zone if not already there (fallback if end_stop_id not found)
                             if end_zone and last_zone != str(end_zone):
-                                # Check if there's a direct path to end zone
-                                found_path = False
-                                for z_row in zones:
-                                    if (str(z_row.get('map_id')) == str(map_id) and
-                                        str(z_row.get('from_zone')) == str(last_zone) and
-                                        str(z_row.get('to_zone')) == str(end_zone)):
+                                # Only add if end_stop_id wasn't already added
+                                if not end_stop_id or end_stop_id not in stop_to_zone_conn:
+                                    # Check if there's a direct path to end zone
+                                    found_path = False
+                                    for z_row in zones:
+                                        if (str(z_row.get('map_id')) == str(map_id) and
+                                            str(z_row.get('from_zone')) == str(last_zone) and
+                                            str(z_row.get('to_zone')) == str(end_zone)):
+                                            zone_sequence.append((str(last_zone), str(end_zone)))
+                                            found_path = True
+                                            break
+                                    if not found_path:
                                         zone_sequence.append((str(last_zone), str(end_zone)))
-                                        found_path = True
-                                        break
-                                if not found_path:
-                                    zone_sequence.append((str(last_zone), str(end_zone)))
+                                    last_zone = str(end_zone)
+                            
+                            # Extract charging stops from task details (for CHARGING label section, not zone_sequence)
+                            # Charging stops should NOT be in zone_sequence - they're called conditionally from END logic
+                            charging_stops_from_task = []
+                            try:
+                                import json
+                                raw = self.selected_task.get('task_details') or ''
+                                details = json.loads(raw) if isinstance(raw, str) and raw.strip() else {}
+                                charging_stops_from_task = [str(s) for s in details.get('charging_stops', [])]
+                            except Exception:
+                                pass
+                            
+                            # Combine all charging stops (for CHARGING label section only)
+                            all_charging_stops = list(set(charging_stop_ids + charging_stops_from_task))
                             
                             # If no zone sequence built, create a simple one
                             if not zone_sequence:
@@ -1081,6 +1101,19 @@ class TaskMonitorWidget(QWidget):
                             
                             self.logger.info(f"Building path with zone_sequence: {zone_sequence}, stops: pickup={pickup_stops}, check={check_stops}, drop={drop_stops}")
                             
+                            # Extract charging stops from task details (if specified)
+                            charging_stops_from_task = []
+                            try:
+                                import json
+                                raw = self.selected_task.get('task_details') or ''
+                                details = json.loads(raw) if isinstance(raw, str) and raw.strip() else {}
+                                charging_stops_from_task = [str(s) for s in details.get('charging_stops', [])]
+                            except Exception:
+                                pass
+                            
+                            # Combine charging stops (from task or auto-detected)
+                            all_charging_stops = list(set(charging_stop_ids + charging_stops_from_task))
+                            
                             out_path = plan_and_write_path(
                                 device_id=device_id,
                                 map_id=str(map_id),
@@ -1091,7 +1124,8 @@ class TaskMonitorWidget(QWidget):
                                 check_stops=check_stops,
                                 drop_stops=drop_stops,
                                 end_zone=str(end_zone) if end_zone else str(drop_zone) if drop_zone else None,
-                                charging_stops=charging_stop_ids,
+                                end_stop_id=str(end_stop_id) if end_stop_id else None,
+                                charging_stops=all_charging_stops if all_charging_stops else None,
                             )
                             results.append(f"{device_id}: {out_path}")
                         except Exception as e:
