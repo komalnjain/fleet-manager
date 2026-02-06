@@ -940,6 +940,29 @@ class TaskMonitorWidget(QWidget):
                             zones = self.csv_handler.read_csv('zones')
                             stops_data = self.csv_handler.read_csv('stops')
                             
+                            # Auto-insert charging stop when battery is low (no user selection needed)
+                            charging_stop_ids = []
+                            try:
+                                battery_val = dev_row.get('battery_level') if dev_row else None
+                                battery = int(float(battery_val)) if battery_val not in (None, '') else 100
+                            except Exception:
+                                battery = 100
+                            battery_low_threshold = 20
+                            if battery <= battery_low_threshold:
+                                for srow in stops_data:
+                                    if str(srow.get('map_id')) != str(map_id):
+                                        continue
+                                    sf = str(srow.get('stop_function') or '').strip().lower()
+                                    if sf == 'charging':
+                                        sid = str(srow.get('stop_id') or '').strip()
+                                        if sid:
+                                            charging_stop_ids = [sid]
+                                            break
+                                if charging_stop_ids:
+                                    self.logger.warning(
+                                        f"Battery low ({battery}%). Inserting charging stop {charging_stop_ids[0]} into path."
+                                    )
+                            
                             # Map stop_id to zone connection (from_zone, to_zone)
                             stop_to_zone_conn = {}
                             for stop_row in stops_data:
@@ -969,6 +992,9 @@ class TaskMonitorWidget(QWidget):
                                 all_stops_ordered.extend([(s, 'check') for s in check_stops])
                             if drop_stops:
                                 all_stops_ordered.extend([(s, 'drop') for s in drop_stops])
+                            if charging_stop_ids:
+                                # Visit charging stop at the end (before end_zone)
+                                all_stops_ordered.extend([(charging_stop_ids[0], 'charging')])
                             
                             # Build zone sequence visiting each stop
                             visited_edges = set()
@@ -1042,6 +1068,7 @@ class TaskMonitorWidget(QWidget):
                                 check_stops=check_stops,
                                 drop_stops=drop_stops,
                                 end_zone=str(end_zone) if end_zone else str(drop_zone) if drop_zone else None,
+                                charging_stops=charging_stop_ids,
                             )
                             results.append(f"{device_id}: {out_path}")
                         except Exception as e:

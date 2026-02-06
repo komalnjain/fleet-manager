@@ -245,6 +245,7 @@ def plan_and_write_path(
     pickup_stops: Optional[List[str]] = None,
     check_stops: Optional[List[str]] = None,
     drop_stops: Optional[List[str]] = None,
+    charging_stops: Optional[List[str]] = None,
 ) -> str:
     """
     Generate path commands and write to data/device_logs/path_{device_id}.csv.
@@ -336,6 +337,10 @@ def plan_and_write_path(
         for s in drop_stops:
             if str(s).strip():
                 allowed_stops[str(s).strip()] = True
+    if charging_stops:
+        for s in charging_stops:
+            if str(s).strip():
+                allowed_stops[str(s).strip()] = True
     if allowed_stops:
         stops_rows = [
             r for r in stops_rows
@@ -383,7 +388,7 @@ def plan_and_write_path(
     fs, ts = _read_device_speeds(device_id)
     vs = _read_device_vertical_speed(device_id)
 
-    # Build stop_operations mapping: stop_id -> operation ('pickup', 'check', 'drop')
+    # Build stop_operations mapping: stop_id -> operation ('pickup', 'check', 'drop', 'charging')
     stop_operations: Dict[str, str] = {}
     if pickup_stops:
         for stop_id in pickup_stops:
@@ -394,6 +399,9 @@ def plan_and_write_path(
     if drop_stops:
         for stop_id in drop_stops:
             stop_operations[str(stop_id)] = 'drop'
+    if charging_stops:
+        for stop_id in charging_stops:
+            stop_operations[str(stop_id)] = 'charging'
     
     # Use end_zone if provided, otherwise fallback to drop_zone for backward compatibility
     target_end_zone = end_zone if end_zone else drop_zone

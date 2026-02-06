@@ -93,6 +93,23 @@ class CSVHandler:
                             self.logger.warning(f"Could not migrate racks.csv to new schema: {me}. Using empty migrated data.")
                             migrated_data = []
 
+                    # Perform migration for stops.csv to new schema (e.g. adding stop_function)
+                    if file_type == 'stops' and 'stop_function' in expected_headers:
+                        try:
+                            migrated = []
+                            for row in existing_data:
+                                # Preserve existing fields; default stop_function to 'pickup' for backward compatibility
+                                new_row = dict(row)
+                                sf = str(new_row.get('stop_function') or '').strip().lower()
+                                if not sf:
+                                    sf = 'pickup'
+                                new_row['stop_function'] = sf
+                                migrated.append(new_row)
+                            migrated_data = migrated
+                        except Exception as me:
+                            self.logger.warning(f"Could not migrate stops.csv to new schema: {me}. Using existing data.")
+                            migrated_data = existing_data
+
                     # Recreate with proper headers
                     self.create_csv_with_headers(file_type, file_path)
                     # Restore data if any

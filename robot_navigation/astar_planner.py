@@ -329,6 +329,8 @@ def generate_edge_commands(
                 commands.append(('CALL', 'CHECK'))
             elif operation == 'drop':
                 commands.append(('CALL', 'DROP'))
+            elif operation == 'charging':
+                commands.append(('CALL', 'CHARGING'))
         elif task_type:
             # Fallback to task_type-based logic
             tt = str(task_type).lower()
@@ -594,11 +596,14 @@ def serialize_commands_to_csv_rows(cmds: List[Tuple[Any, ...]], device_id: Optio
     rows.append([])  # Blank line
 
     tt = str(task_type).lower() if task_type else ""
-
-    if tt == 'charging':
-        rows.append(["LABEL", "CHARGING"])
-        rows.append(["RETURN"])
-        return rows
+    has_charging_call = False
+    try:
+        for c in cmds:
+            if isinstance(c, (list, tuple)) and len(c) >= 2 and str(c[0]).upper() == 'CALL' and str(c[1]).upper() == 'CHARGING':
+                has_charging_call = True
+                break
+    except Exception:
+        has_charging_call = False
 
     rows.append(["LABEL", "PICKUP"])
 
@@ -675,7 +680,27 @@ def serialize_commands_to_csv_rows(cmds: List[Tuple[Any, ...]], device_id: Optio
                 pass
 
     rows.append(["RETURN"])
-    
+
+    # Add CHARGING label section if needed (either charging task_type or CALL,CHARGING exists in cmds)
+    if tt == 'charging' or has_charging_call:
+        rows.append([])  # Blank line
+        rows.append(["LABEL", "CHARGING"])
+        if device_id:
+            charging_logic_path = os.path.join(
+                os.path.dirname(os.path.dirname(__file__)),
+                "data", "device_logs", f"{device_id}_CHARGING_Logic.csv"
+            )
+            if os.path.exists(charging_logic_path):
+                try:
+                    with open(charging_logic_path, 'r', newline='', encoding='utf-8') as f:
+                        for line in f:
+                            line = line.strip()
+                            if line:
+                                rows.append(line.split(','))
+                except Exception:
+                    pass
+        rows.append(["RETURN"])
+
     return rows
 
 
