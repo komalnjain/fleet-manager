@@ -22,6 +22,8 @@ class AutomaticTaskService:
         self.distance_calculator = DistanceCalculator(csv_handler)
         self.logger = setup_logger('automatic_task_service')
         self.data_dir = Path('data')
+        # Per-file row count: only process dispatcher rows we haven't seen (avoids duplicate tasks for same ack)
+        self._last_processed_ack_row_count: dict = {}
 
     def monitor_and_process(self):
         """Scan for create_pickup_task CSV files and dispatcher acknowledgments."""
@@ -34,10 +36,13 @@ class AutomaticTaskService:
             except Exception as e:
                 self.logger.error(f"Error processing {file_path}: {e}")
         
-        # 2. Monitor dispatcher CSV files for "Tyre Ready" acknowledgments
+        # 2. Monitor dispatcher CSV files for "Tyre Ready" acknowledgments (write task only, no device yet)
         self._monitor_dispatcher_acknowledgments()
         
-        # 3. Sync statuses for active tasks (handles both auto and manual tasks feedback)
+        # 3. Assign pending auto tasks to idle devices (FIFO), generate path, send to device
+        self._assign_pending_auto_tasks_to_idle_devices()
+        
+        # 4. Sync statuses for active tasks (handles both auto and manual tasks feedback)
         self.sync_task_statuses()
 
     def sync_task_statuses(self):
@@ -300,49 +305,57 @@ class AutomaticTaskService:
             self.logger.error(f"Error in automatic task trigger: {e}")
     
     def _monitor_dispatcher_acknowledgments(self):
-        """Monitor dispatcher CSV files for 'Tyre Ready{pickup stop id}' acknowledgments."""
+        """Monitor dispatcher CSV files for 'Tyre Ready{pickup stop id}' acknowledgments.
+        Only processes NEW rows since last run so one acknowledgment creates exactly one task.
+        """
         try:
-            # Get all device IDs to check their dispatcher CSV files
             devices = self.csv_handler.read_csv('devices')
             device_logs_dir = self.data_dir / 'device_logs'
+            dispatcher_dir_str = str(device_logs_dir)
             
             for device in devices:
                 device_id = device.get('device_id')
                 if not device_id:
                     continue
                 
-                # Check dispatcher CSV file (assuming format: {device_id}.csv in device_logs)
                 dispatcher_file = device_logs_dir / f"{device_id}.csv"
                 if not dispatcher_file.exists():
                     continue
                 
+                file_key = str(dispatcher_file)
                 try:
-                    # Read the CSV file and check for acknowledgments
                     with open(dispatcher_file, 'r', encoding='utf-8') as f:
                         reader = csv.DictReader(f)
                         rows = list(reader)
+                    
+                    if file_key not in self._last_processed_ack_row_count:
+                        # First time seeing this file: only process rows added after now
+                        last = len(rows)
+                        self._last_processed_ack_row_count[file_key] = last
+                        new_rows = []
+                    else:
+                        last = self._last_processed_ack_row_count[file_key]
+                        if last > len(rows):
+                            last = 0  # file was truncated
+                        new_rows = rows[last:]
+                        self._last_processed_ack_row_count[file_key] = len(rows)
+                    
+                    for row in new_rows:
+                        ack_text = None
+                        for col in ['acknowledgment', 'acknowledgement', 'message', 'status', 'command']:
+                            val = row.get(col, '')
+                            if val and 'tyre ready' in str(val).lower():
+                                ack_text = str(val).strip()
+                                break
                         
-                        # Check the last few rows for "Tyre Ready" acknowledgment
-                        for row in rows[-10:]:  # Check last 10 rows
-                            # Look for acknowledgment in various possible columns
-                            ack_text = None
-                            for col in ['acknowledgment', 'acknowledgement', 'message', 'status', 'command']:
-                                val = row.get(col, '')
-                                if val and 'tyre ready' in str(val).lower():
-                                    ack_text = str(val).strip()
-                                    break
-                            
-                            if ack_text and 'tyre ready' in ack_text.lower():
-                                # Extract pickup stop ID from acknowledgment
-                                # Format: "Tyre Ready{stop_id}" or "Tyre Ready {stop_id}" or similar
-                                match = re.search(r'tyre\s+ready[{\s]*([^}\s]+)', ack_text, re.IGNORECASE)
-                                if match:
-                                    pickup_stop_id = match.group(1).strip()
-                                    self.logger.info(f"Found Tyre Ready acknowledgment for stop {pickup_stop_id} from dispatcher {device_id}")
-                                    
-                                    # Create task automatically
-                                    self._create_task_from_acknowledgment(device, pickup_stop_id)
-                                    break  # Process only one acknowledgment per cycle
+                        if not ack_text or 'tyre ready' not in ack_text.lower():
+                            continue
+                        
+                        match = re.search(r'tyre\s+ready[{\s]*([^}\s]+)', ack_text, re.IGNORECASE)
+                        if match:
+                            pickup_stop_id = match.group(1).strip()
+                            self.logger.info(f"Found Tyre Ready acknowledgment for stop {pickup_stop_id} from dispatcher {device_id}")
+                            self._create_task_from_acknowledgment(device, pickup_stop_id)
                 except Exception as e:
                     self.logger.error(f"Error reading dispatcher file {dispatcher_file}: {e}")
         except Exception as e:
@@ -406,19 +419,10 @@ class AutomaticTaskService:
                 self.logger.warning(f"Could not determine drop_zone for map {map_id}")
                 return
             
-            # Check if device is eligible
-            eligible_devices = self._get_eligible_devices(map_id, excluded_device_ids=set())
-            device_id_str = str(device.get('id'))
-            selected_device = next((d for d in eligible_devices if str(d.get('id')) == device_id_str), None)
-            
-            if not selected_device:
-                self.logger.info(f"Device {device.get('device_id')} is not eligible for task assignment")
-                return
-            
-            # Build complete task data
+            # Build task data without assigning any device (FIFO assignment happens in _assign_pending_auto_tasks_to_idle_devices)
             task_data = self._build_complete_task_data(
                 map_id=map_id,
-                device=selected_device,
+                device=None,
                 pickup_stop_id=pickup_stop_id,
                 check_stop_id=check_stop_id,
                 drop_stop_id=drop_stop_id,
@@ -427,63 +431,107 @@ class AutomaticTaskService:
                 drop_zone=drop_zone
             )
             
-            # Create task
+            # Create task in CSV only; path generation and device assignment happen in FIFO order when device is idle
             if self.csv_handler.append_to_csv('tasks', task_data):
-                self.logger.info(f"Automatically created task {task_data['task_id']} from Tyre Ready acknowledgment")
-                
-                # Generate path planning with all stops
-                try:
-                    from services.path_planner_service import plan_and_write_path
-                    from robot_navigation.zone_navigator import get_zone_navigation_manager
-                    
-                    # Get current zone and direction
-                    device_id = selected_device.get('device_id')
-                    nav = get_zone_navigation_manager()
-                    nav_info = nav.get_navigation_info(device_id)
-                    current_zone = nav_info.get('current_zone') or '1'
-                    initial_direction = nav_info.get('locked_direction') or 'north'
-                    
-                    # Build zone sequence (simplified - will be improved)
-                    zones = self.csv_handler.read_csv('zones')
-                    zone_sequence = self._build_zone_sequence_for_stops(
-                        map_id, current_zone, pickup_stop_id, check_stop_id, 
-                        drop_stop_id, end_stop_id, charging_stop_id, zones, stops
-                    )
-                    
-                    plan_and_write_path(
-                        device_id=device_id,
-                        map_id=map_id,
-                        zone_sequence=zone_sequence,
-                        initial_direction=str(initial_direction).lower(),
-                        task_type='picking',
-                        pickup_stops=[pickup_stop_id] if pickup_stop_id else None,
-                        check_stops=[check_stop_id] if check_stop_id else None,
-                        drop_stops=[drop_stop_id] if drop_stop_id else None,
-                        end_stop_id=end_stop_id,
-                        charging_stops=[charging_stop_id] if charging_stop_id else None,
-                    )
-                    
-                    self.logger.info(f"Generated path planning for device {device_id}")
-                    
-                    # Update device task status
-                    self.device_data_handler.update_device_task_pending_by_task(
-                        selected_device['id'], task_data['task_id']
-                    )
-                    
-                    # Auto trigger after 7 seconds
-                    QTimer.singleShot(7000, lambda: self._trigger_automatic_execution(
-                        selected_device['id'], task_data['task_id']
-                    ))
-                except Exception as e:
-                    self.logger.error(f"Failed to generate path planning: {e}")
+                self.logger.info(f"Automatically created task {task_data['task_id']} from Tyre Ready acknowledgment (unassigned; will assign on device availability)")
         except Exception as e:
             self.logger.error(f"Error creating task from acknowledgment: {e}")
     
-    def _build_complete_task_data(self, map_id: str, device: Dict, pickup_stop_id: str,
+    def _assign_pending_auto_tasks_to_idle_devices(self):
+        """Assign pending auto-created tasks (FIFO) to an idle device, generate path, and send to device."""
+        try:
+            tasks = self.csv_handler.read_csv('tasks')
+            # Unassigned auto tasks: pending, automatic in details, no device assigned
+            unassigned = []
+            for t in tasks:
+                if str(t.get('status', '')).lower() != 'pending':
+                    continue
+                if str(t.get('task_type', '')).lower() != 'picking':
+                    continue
+                aid = str(t.get('assigned_device_id') or '').strip()
+                aids = str(t.get('assigned_device_ids') or '').strip()
+                if aid or aids:
+                    continue
+                raw = t.get('task_details') or ''
+                try:
+                    details = json.loads(raw) if isinstance(raw, str) and raw.strip() else {}
+                except Exception:
+                    details = {}
+                if not details.get('automatic'):
+                    continue
+                unassigned.append(t)
+            if not unassigned:
+                return
+            # FIFO by created_at
+            unassigned.sort(key=lambda x: (x.get('created_at') or ''))
+            task = unassigned[0]
+            map_id = str(task.get('map_id') or '').strip()
+            if not map_id:
+                return
+            # Idle devices on this map (not assigned to any running/pending task)
+            eligible = self._get_eligible_devices(map_id, excluded_device_ids=set())
+            if not eligible:
+                return
+            # Pick first eligible (idle) device; optionally use nearest to first stop
+            details = json.loads(task.get('task_details') or '{}') if isinstance(task.get('task_details'), str) else (task.get('task_details') or {})
+            pickup_list = details.get('pickup_stops') or []
+            first_stop = pickup_list[0] if pickup_list else None
+            selected_device = self._select_nearest_device(map_id, eligible, first_stop) if first_stop else eligible[0]
+            if not selected_device:
+                selected_device = eligible[0]
+            device_id_val = selected_device.get('device_id') or selected_device.get('id')
+            device_pk = str(selected_device.get('id'))
+            task_pk = task.get('id')
+            # Update task with assigned device
+            self.csv_handler.update_csv_row('tasks', task_pk, {
+                'assigned_device_id': device_pk,
+                'assigned_device_ids': device_pk,
+            })
+            self.logger.info(f"Assigned task {task.get('task_id')} to device {device_id_val} (FIFO)")
+            # Generate path for this task + device
+            try:
+                from services.path_planner_service import plan_and_write_path
+                from utils.zone_navigation_manager import get_zone_navigation_manager
+                zones = self.csv_handler.read_csv('zones')
+                stops = self.csv_handler.read_csv('stops')
+                pickup_stop_id = (details.get('pickup_stops') or [None])[0]
+                check_stop_id = (details.get('check_stops') or [None])[0]
+                drop_stop_id = (details.get('drop_stops') or [None])[0]
+                end_stop_id = details.get('end_stop_id') or None
+                charging_stop_id = (details.get('charging_stops') or [None])[0]
+                nav = get_zone_navigation_manager()
+                nav_info = nav.get_navigation_info(str(device_id_val))
+                current_zone = nav_info.get('current_zone') or '1'
+                initial_direction = nav_info.get('locked_direction') or 'north'
+                zone_sequence = self._build_zone_sequence_for_stops(
+                    map_id, current_zone, pickup_stop_id, check_stop_id,
+                    drop_stop_id, end_stop_id, charging_stop_id, zones, stops
+                )
+                plan_and_write_path(
+                    device_id=str(device_id_val),
+                    map_id=map_id,
+                    zone_sequence=zone_sequence,
+                    initial_direction=str(initial_direction).lower(),
+                    task_type='picking',
+                    pickup_stops=[pickup_stop_id] if pickup_stop_id else None,
+                    check_stops=[check_stop_id] if check_stop_id else None,
+                    drop_stops=[drop_stop_id] if drop_stop_id else None,
+                    end_stop_id=end_stop_id or None,
+                    charging_stops=[charging_stop_id] if charging_stop_id else None,
+                )
+                self.logger.info(f"Generated path for task {task.get('task_id')} on device {device_id_val}")
+                self.device_data_handler.update_device_task_pending_by_task(device_pk, task.get('task_id'))
+                QTimer.singleShot(7000, lambda: self._trigger_automatic_execution(device_pk, task.get('task_id')))
+            except Exception as e:
+                self.logger.error(f"Failed to generate path for auto task {task.get('task_id')}: {e}")
+        except Exception as e:
+            self.logger.error(f"Error in _assign_pending_auto_tasks_to_idle_devices: {e}")
+    
+    def _build_complete_task_data(self, map_id: str, device: Optional[Dict], pickup_stop_id: str,
                                    check_stop_id: Optional[str], drop_stop_id: Optional[str],
                                    end_stop_id: Optional[str], charging_stop_id: Optional[str],
                                    drop_zone: str) -> Dict:
-        """Build complete task data with all stops."""
+        """Build complete task data with all stops. If device is None, task is unassigned (for FIFO assignment later)."""
         task_id = f"TASK{self.csv_handler.get_next_id('tasks'):04d}"
         current_time = datetime.now().isoformat()
         
@@ -518,14 +566,15 @@ class AutomaticTaskService:
         if charging_stop_id:
             all_stop_ids.append(charging_stop_id)
         
+        dev_id = str(device['id']) if device else ''
         return {
             'id': '',
             'task_id': task_id,
             'task_name': f"Auto Task - {pickup_stop_id}",
             'task_type': 'picking',
             'status': 'pending',
-            'assigned_device_id': str(device['id']),
-            'assigned_device_ids': str(device['id']),
+            'assigned_device_id': dev_id,
+            'assigned_device_ids': dev_id,
             'assigned_user_id': '',
             'description': f"Automatically created from Tyre Ready acknowledgment for stop {pickup_stop_id}",
             'estimated_duration': '',

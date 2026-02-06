@@ -938,7 +938,8 @@ class TaskMonitorWidget(QWidget):
                     start_zone = self._derive_start_zone_for_audit(device_id, map_id)
                     zone_sequence = self._build_full_map_sequence(map_id, start_zone)
                 else:
-                    if task_type == 'picking' and (pickup_stops or pickup_racks) and drop_zone:
+                    # Picking with stops only (no from/to zones required): use stop-based path generation
+                    if task_type == 'picking' and (pickup_stops or pickup_racks or check_stops or drop_stops or end_stop_id):
 
                         # Round-trip picking: for each stop, generate path:
                         # current position -> stop edge (PICKUP only for that stop) -> drop zone (DROP)
@@ -1085,10 +1086,10 @@ class TaskMonitorWidget(QWidget):
                             # Combine all charging stops (for CHARGING label section only)
                             all_charging_stops = list(set(charging_stop_ids + charging_stops_from_task))
                             
-                            # If no zone sequence built, create a simple one
+                            # If no zone sequence built, create a simple one (no from/to zones required)
                             if not zone_sequence:
                                 start_z = str(current_zone) if current_zone else '1'
-                                end_z = str(end_zone) if end_zone else (str(drop_zone) if drop_zone else '1')
+                                end_z = str(end_zone) if end_zone else (str(drop_zone) if drop_zone else (str(last_zone) if last_zone else '1'))
                                 zone_sequence = [(start_z, end_z)]
                             
                             initial_direction = 'north'
