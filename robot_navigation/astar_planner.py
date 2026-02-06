@@ -273,10 +273,11 @@ def generate_edge_commands(
     """
     commands: List[Tuple[Any, ...]] = []
 
-    # Turn if needed before entering edge direction
+    # Turn if needed before entering edge direction.
+    # Do not add ALIGN here: the caller already adds ALIGN at the previous segment's to_zone
+    # (which equals this edge's from_zone), so adding ALIGN(from_zone) again would duplicate.
     turn_cmd, deg = compute_turn(current_direction, edge.direction)
     if turn_cmd and deg:
-        commands.append(('ALIGN', str(edge.from_zone), '0', '0'))
         commands.append((turn_cmd, deg, 'DEG'))
         current_direction = edge.direction  # orientation after the turn
 
@@ -958,14 +959,18 @@ def _generate_charging_navigation(
                         if (str(zone.get('id')) == str(charging_conn_id) and
                             str(zone.get('map_id')) == str(map_id)):
                             # Add alignment to the zone connection
-                            nav_commands.append(["ALIGN", str(charging_conn_id), "0", "0"])
+                            # ALIGN should use zone ids, not connection ids
+                            align_zone = charging_from_zone or charging_stop_zone
+                            if align_zone is not None:
+                                nav_commands.append(["ALIGN", str(align_zone), "0", "0"])
                             # Add forward command (convert meters to mm)
                             nav_commands.append(["F", str(int(abs(dist_diff) * 1000)), "MM"])
                             break
         elif end_stop_zone == charging_stop_zone:
             # Different edges but same zone - might need alignment to charging connection
-            if charging_conn_id:
-                nav_commands.append(["ALIGN", str(charging_conn_id), "0", "0"])
+            if charging_stop_zone is not None:
+                # ALIGN should use zone ids, not connection ids
+                nav_commands.append(["ALIGN", str(charging_stop_zone), "0", "0"])
     
     except Exception as e:
         # If navigation generation fails, add a comment (but don't break the path)
