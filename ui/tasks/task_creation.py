@@ -1326,7 +1326,7 @@ class TaskCreationWidget(QWidget):
         
         if task_type == 'picking':
             # For picking: map, at least one pickup stop, and end zone must be selected
-            # Check stops and drop stops are optional
+            # Check stops optional; Drop stops required if map defines any drop stops
             has_map = hasattr(self, 'pickup_map_combo') and self.pickup_map_combo.currentIndex() > 0
             has_end_zone = hasattr(self, 'end_zone_combo') and self.end_zone_combo.currentIndex() > 0
             has_pickup_stops = False
@@ -1336,10 +1336,19 @@ class TaskCreationWidget(QWidget):
                     if item and item.isSelected():
                         has_pickup_stops = True
                         break
+            # Drop stops requirement if drop list has items
+            has_drop_stops = True
+            if hasattr(self, 'drop_stop_list') and self.drop_stop_list.count() > 0:
+                has_drop_stops = False
+                for i in range(self.drop_stop_list.count()):
+                    item = self.drop_stop_list.item(i)
+                    if item and item.isSelected():
+                        has_drop_stops = True
+                        break
             # End zone should be enabled if pickup stops are selected
             if has_pickup_stops and hasattr(self, 'end_zone_combo'):
                 self.end_zone_combo.setEnabled(True)
-            task_details_filled = has_map and has_pickup_stops and has_end_zone
+            task_details_filled = has_map and has_pickup_stops and has_drop_stops and has_end_zone
         elif task_type == 'storing':
             # For storing: map, from zone, to zone, and end zone must be selected
             task_details_filled = (
@@ -1541,6 +1550,18 @@ class TaskCreationWidget(QWidget):
                 if hasattr(self, 'pickup_stop_list'):
                     self.pickup_stop_list.setFocus()
                 return False
+            # Require at least one drop stop if drop stops exist on map
+            if hasattr(self, 'drop_stop_list') and self.drop_stop_list.count() > 0:
+                has_drop = False
+                for i in range(self.drop_stop_list.count()):
+                    item = self.drop_stop_list.item(i)
+                    if item and item.isSelected():
+                        has_drop = True
+                        break
+                if not has_drop:
+                    QMessageBox.warning(self, "Validation Error", "Select at least one Drop Stop")
+                    self.drop_stop_list.setFocus()
+                    return False
             # End zone
             if not self.end_zone_combo.currentData():
                 QMessageBox.warning(self, "Validation Error", "End Zone is required")
@@ -1972,8 +1993,10 @@ class TaskCreationWidget(QWidget):
                     self.end_zone_combo.addItem(zone, zone)
                 # End zone enabled after drop stops are selected
                 
-                # Enable pickup stops list and populate with all stops
+                # Enable all stop lists (they will be populated by stop_function)
                 self.pickup_stop_list.setEnabled(True)
+                self.check_stop_list.setEnabled(True)
+                self.drop_stop_list.setEnabled(True)
 
                 stops = self.csv_handler.read_csv('stops')
                 racks = self.csv_handler.read_csv('racks')
@@ -1997,18 +2020,42 @@ class TaskCreationWidget(QWidget):
                             continue
                         racks_by_stop.setdefault(sid, []).append(r)
 
-                added_stops = set()
+                # Populate stops by stop_function (pickup/check/drop). Default is 'pickup' for older rows.
+                added_pickup, added_check, added_drop = set(), set(), set()
                 for stop_data in stops:
                     if str(stop_data.get('map_id', '')) != str(selected_map_id):
                         continue
                     stop_id = str(stop_data.get('stop_id', '')).strip()
-                    if not stop_id or stop_id in added_stops:
+                    if not stop_id:
                         continue
                     stop_name = stop_data.get('name', stop_id)
+                    sf = str(stop_data.get('stop_function') or 'pickup').strip().lower()
                     item = QListWidgetItem(f"{stop_name} ({stop_id})")
                     item.setData(Qt.UserRole, stop_id)
-                    self.pickup_stop_list.addItem(item)
-                    added_stops.add(stop_id)
+                    if sf == 'pickup':
+                        if stop_id in added_pickup:
+                            continue
+                        self.pickup_stop_list.addItem(item)
+                        added_pickup.add(stop_id)
+                    elif sf == 'check':
+                        if stop_id in added_check:
+                            continue
+                        self.check_stop_list.addItem(item)
+                        added_check.add(stop_id)
+                    elif sf == 'drop':
+                        if stop_id in added_drop:
+                            continue
+                        self.drop_stop_list.addItem(item)
+                        added_drop.add(stop_id)
+                    else:
+                        # ignore charging/unknown here (charging is auto-triggered, not user-selected)
+                        pass
+
+                # If there are no check/drop stops defined, keep those lists disabled
+                if self.check_stop_list.count() == 0:
+                    self.check_stop_list.setEnabled(False)
+                if self.drop_stop_list.count() == 0:
+                    self.drop_stop_list.setEnabled(False)
                 
                 # Ensure pickup stop selection handler is connected
                 try:
@@ -2023,43 +2070,21 @@ class TaskCreationWidget(QWidget):
         self.check_form_completion()
     
     def on_pickup_stop_selection_changed(self):
-        """Handle pickup stop selection - enable check stops and populate with unselected stops"""
+        """Handle pickup stop selection - enable End Zone and refresh devices."""
         selected_pickup_stops = self.get_selected_stops_from_list(self.pickup_stop_list) or []
         self.logger.info(f"Pickup stops selected: {selected_pickup_stops}")
         
         if selected_pickup_stops:
-            # Enable check stops (optional, but enabled after pickup stops are selected)
-            self.check_stop_list.setEnabled(True)
-            # Populate check stops with stops not selected in pickup
-            self.populate_unselected_stops(self.check_stop_list, selected_pickup_stops, [])
-            
-            # Also enable and populate drop stops (they're independent of check stops)
-            self.drop_stop_list.setEnabled(True)
-            self.populate_unselected_stops(self.drop_stop_list, selected_pickup_stops, [])
-            
             # Enable end zone
             self.end_zone_combo.setEnabled(True)
         else:
-            # Disable check and drop stops if no pickup stops selected
-            self.check_stop_list.setEnabled(False)
-            self.check_stop_list.clear()
-            self.drop_stop_list.setEnabled(False)
-            self.drop_stop_list.clear()
+            # Disable end zone if no pickup stops selected
             self.end_zone_combo.setEnabled(False)
         
         self.check_form_completion()
     
     def on_check_stop_selection_changed(self):
-        """Handle check stop selection - update drop stops to exclude selected check stops"""
-        selected_pickup_stops = self.get_selected_stops_from_list(self.pickup_stop_list) or []
-        selected_check_stops = self.get_selected_stops_from_list(self.check_stop_list) or []
-        
-        # Update drop stops to exclude both pickup and check stops
-        if selected_pickup_stops:
-            # Drop stops should already be enabled from pickup selection, just repopulate
-            if self.drop_stop_list.isEnabled():
-                self.populate_unselected_stops(self.drop_stop_list, selected_pickup_stops, selected_check_stops)
-        
+        """Handle check stop selection change (no list filtering needed when stop_function is defined)."""
         self.check_form_completion()
     
     def on_drop_stop_selection_changed(self):

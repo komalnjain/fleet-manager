@@ -2722,6 +2722,7 @@ class MapManagementWidget(QWidget):
                     'right_bins_distance': right_dist,
                     'distance_from_start': dist_m,
                     'stop_type': st,
+                    'stop_function': (self.stop_function_combo.currentText().strip().lower() if hasattr(self, 'stop_function_combo') else 'pickup'),
                 }
 
                 if self.stop_edit_mode:
@@ -3217,6 +3218,14 @@ class MapManagementWidget(QWidget):
         self.stop_type_combo.currentTextChanged.connect(self.update_stop_type_fields)
         self.apply_combo_style(self.stop_type_combo)
         form_layout.addRow("Stop Type:", self.stop_type_combo)
+
+        # Stop function (logical operation)
+        # This is used later in task creation to show only the right stops under Pickup/Check/Drop.
+        self.stop_function_combo = QComboBox()
+        self.stop_function_combo.addItems(["Pickup", "Check", "Drop", "Charging"])
+        self.stop_function_combo.currentTextChanged.connect(self.validate_stop_inputs)
+        self.apply_combo_style(self.stop_function_combo)
+        form_layout.addRow("Stop Function:", self.stop_function_combo)
         
         # Distance from zone (meters)
         self.distance_from_zone_label = QLabel("Distance from Zone (m)")
@@ -3794,6 +3803,15 @@ class MapManagementWidget(QWidget):
         idx = self.stop_type_combo.findText(st.title())
         if idx >= 0:
             self.stop_type_combo.setCurrentIndex(idx)
+
+        # Stop function (pickup/check/drop/charging)
+        if hasattr(self, 'stop_function_combo'):
+            sf = (stop.get('stop_function') or 'pickup').strip().lower()
+            sf_idx = self.stop_function_combo.findText(sf.title())
+            if sf_idx >= 0:
+                self.stop_function_combo.setCurrentIndex(sf_idx)
+            else:
+                self.stop_function_combo.setCurrentIndex(0)
             
         self.distance_from_zone_input.setValue(float(stop.get('distance_from_start', 1.0)))
         
@@ -3826,6 +3844,8 @@ class MapManagementWidget(QWidget):
         self.stop_id_input.clear()
         self.stop_name_input.clear()
         self.stop_type_combo.setCurrentIndex(0)
+        if hasattr(self, 'stop_function_combo'):
+            self.stop_function_combo.setCurrentIndex(0)
         self.distance_from_zone_input.setValue(1.0)
         self.side_distance_input.setValue(2.0)
         self.zone_for_stops_combo.setCurrentIndex(0)

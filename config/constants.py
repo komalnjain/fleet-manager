@@ -52,7 +52,8 @@ CSV_HEADERS = {
     'users': ['id', 'username', 'email', 'employee_id', 'profile_picture', 'is_active', 'created_at'],
     'maps': ['id', 'name', 'description', 'width', 'height', 'meter_in_pixels', 'created_at'],
     'zones': ['id', 'map_id', 'from_zone', 'to_zone', 'magnitude', 'direction', 'created_at', 'edited_at'],
-    'stops': ['id', 'zone_connection_id', 'map_id', 'stop_id', 'name', 'x_coordinate', 'y_coordinate', 'left_bins_count', 'right_bins_count', 'left_bins_distance', 'right_bins_distance', 'distance_from_start', 'stop_type', 'created_at'],
+    # stop_function: logical operation the stop represents (pickup/check/drop/charging)
+    'stops': ['id', 'zone_connection_id', 'map_id', 'stop_id', 'name', 'x_coordinate', 'y_coordinate', 'left_bins_count', 'right_bins_count', 'left_bins_distance', 'right_bins_distance', 'distance_from_start', 'stop_type', 'stop_function', 'created_at'],
     'stop_groups': ['id', 'map_id', 'name', 'stop_ids', 'created_at'],
     'zone_alignment': ['id', 'map_id', 'zone', 'alignment'],
     'products': ['id', 'product_id', 'product_name', 'sku_location_id', 'sku_weight', 'created_at', 'updated_at'],
