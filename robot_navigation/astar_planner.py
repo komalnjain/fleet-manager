@@ -135,6 +135,7 @@ def astar_path(graph: ZoneGraph, start: ZoneId, goal: ZoneId) -> List[ZoneId]:
 
 # Stops handling
 @dataclass
+@dataclass
 class Stop:
     connection_id: int
     name: str
@@ -142,9 +143,10 @@ class Stop:
     distance_from_start_m: float
     side: str  # 'left'|'right'
     side_distance_m: float
-    stop_type: str  # 'left'|'right'|'center'|''
+    stop_type: str  # 'left'|'right'|'center'|'' (positional type)
     rack_id: str = ''
     rack_distance_mm: float = 0.0
+    stop_function: str = ''  # 'pickup'|'check'|'drop'|'charging'|'end' (operational type)
 
 
 def infer_side(stop_row: Dict[str, Any]) -> str:
@@ -211,6 +213,8 @@ def load_stops(stops_rows: List[Dict[str, str]], map_id: str) -> Dict[int, List[
             rack_id = str(r.get('rack_id') or '').strip()
             rack_distance_mm = _to_float(r.get('rack_distance_mm'))
             stop_id = str(r.get('stop_id') or '').strip()
+            # Use stop_function for operation type (pickup, check, drop, charging, end)
+            stop_function = str(r.get('stop_function', '') or '').strip().lower()
             by_conn.setdefault(conn_id, []).append(
                 Stop(
                     connection_id=conn_id,
@@ -219,16 +223,28 @@ def load_stops(stops_rows: List[Dict[str, str]], map_id: str) -> Dict[int, List[
                     distance_from_start_m=dist_m,
                     side=side,
                     side_distance_m=side_dist_m,
-                    stop_type=stype,
+                    stop_type=stype,  # This is positional (center/left/right)
                     rack_id=rack_id,
                     rack_distance_mm=rack_distance_mm,
+                    stop_function=stop_function,  # This is operational (pickup/check/drop/charging/end)
                 )
             )
         except Exception:
             continue
-    # sort by distance
+    # sort by distance, then by operation priority (pickup → check → drop → charging → end)
+    operation_priority = {
+        'pickup': 1,
+        'check': 2,
+        'drop': 3,
+        'charging': 4,
+        'end': 5,
+    }
     for k in by_conn:
-        by_conn[k].sort(key=lambda s: s.distance_from_start_m)
+        # Sort by distance first, then by stop function (operation) priority
+        by_conn[k].sort(key=lambda s: (
+            s.distance_from_start_m,
+            operation_priority.get(s.stop_function, 999)
+        ))
     return by_conn
 
 
@@ -331,6 +347,8 @@ def generate_edge_commands(
                 commands.append(('CALL', 'DROP'))
             elif operation == 'charging':
                 commands.append(('CALL', 'CHARGING'))
+            elif operation == 'end':
+                commands.append(('CALL', 'END'))
         elif task_type:
             # Fallback to task_type-based logic
             tt = str(task_type).lower()
@@ -392,7 +410,9 @@ def generate_path_commands(
     selected_racks_by_stop: Optional[Dict[str, List[Tuple[str, float]]]] = None,
     drop_zone: Optional[str] = None,
     end_zone: Optional[str] = None,  # Renamed from drop_zone, but keeping drop_zone for backward compatibility
+    end_stop_id: Optional[str] = None,  # Stop ID to use for CALL,{end_stop_id} instead of CALL,END
     stop_operations: Optional[Dict[str, str]] = None,  # Maps stop_id to operation: 'pickup', 'check', 'drop'
+    map_id: Optional[str] = None,  # Map ID to filter zone rows
 ) -> List[Tuple[Any, ...]]:
     # Helper to choose ALIGN variant based on per-zone alignment settings.
     def _align_cmd(zone: ZoneId) -> Tuple[str, str, str, str]:
@@ -408,6 +428,9 @@ def generate_path_commands(
     # map connection by (from,to) to edge
     conn_lookup: Dict[Tuple[str, str], Edge] = {}
     for r in zones_rows:
+        # Filter by map_id if provided to avoid conflicts between maps
+        if map_id and str(r.get('map_id', '')) != str(map_id):
+            continue
         try:
             edge = Edge(
                 from_zone=str(r['from_zone']).strip(),
@@ -491,7 +514,11 @@ def generate_path_commands(
                         # Last edge reaching end zone - add ALIGN and END marker
                         # END is just a marker for final destination, no operations
                         cmds.append(_align_cmd(edge.to_zone))
-                        cmds.append(('CALL', 'END'))
+                        # Note: CALL,END should already be generated at the end_stop via stop_operations
+                        # Skip adding CALL,END here to avoid duplication when end_stop_id is provided
+                        # Only emit CALL,END if no end_stop_id is specified
+                        if not end_stop_id:
+                            cmds.append(('CALL', 'END'))
             except Exception:
                 pass
 
@@ -592,7 +619,8 @@ def serialize_commands_to_csv_rows(cmds: List[Tuple[Any, ...]], device_id: Optio
             rows.append([str(item)])
     
     # Add blank line and LABEL sections at the end
-    rows.append(["CALL", "END"])
+    # Note: CALL,END is already added in generate_path_commands when reaching end_zone
+    # Do not add it again here to avoid duplication
     rows.append([])  # Blank line
 
     tt = str(task_type).lower() if task_type else ""

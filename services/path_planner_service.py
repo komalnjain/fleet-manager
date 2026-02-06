@@ -213,6 +213,7 @@ def generate_leg_commands(
         selected_racks_by_stop=None,
         drop_zone=drop_zone,
         stop_operations=stop_operations,
+        map_id=map_id,  # Pass map_id to filter zone rows correctly
     )
 
     # Determine final direction from last edge if possible
@@ -242,6 +243,7 @@ def plan_and_write_path(
     selected_rack_ids: Optional[List[str]] = None,
     drop_zone: Optional[str] = None,
     end_zone: Optional[str] = None,
+    end_stop_id: Optional[str] = None,
     pickup_stops: Optional[List[str]] = None,
     check_stops: Optional[List[str]] = None,
     drop_stops: Optional[List[str]] = None,
@@ -254,6 +256,7 @@ def plan_and_write_path(
     - map_id: which map to use from zones/stops
     - zone_sequence: ordered list of (from_zone,to_zone) pairs to traverse
     - initial_direction: robot's current facing direction ('north','south','east','west')
+    - end_stop_id: stop_id to use for CALL,END (replaces end_zone for picking tasks)
     - output_dir: optional override of output directory (defaults to data/device_logs)
 
     Returns the path to the written file.
@@ -341,6 +344,10 @@ def plan_and_write_path(
         for s in charging_stops:
             if str(s).strip():
                 allowed_stops[str(s).strip()] = True
+    # Include end_stop_id so it's not filtered out
+    if end_stop_id:
+        if str(end_stop_id).strip():
+            allowed_stops[str(end_stop_id).strip()] = True
     if allowed_stops:
         stops_rows = [
             r for r in stops_rows
@@ -388,7 +395,7 @@ def plan_and_write_path(
     fs, ts = _read_device_speeds(device_id)
     vs = _read_device_vertical_speed(device_id)
 
-    # Build stop_operations mapping: stop_id -> operation ('pickup', 'check', 'drop', 'charging')
+    # Build stop_operations mapping: stop_id -> operation ('pickup', 'check', 'drop', 'charging', 'end')
     stop_operations: Dict[str, str] = {}
     if pickup_stops:
         for stop_id in pickup_stops:
@@ -402,9 +409,29 @@ def plan_and_write_path(
     if charging_stops:
         for stop_id in charging_stops:
             stop_operations[str(stop_id)] = 'charging'
+    # Add end_stop_id to stop_operations so CALL,END is generated at that stop
+    if end_stop_id:
+        stop_operations[str(end_stop_id)] = 'end'
     
-    # Use end_zone if provided, otherwise fallback to drop_zone for backward compatibility
-    target_end_zone = end_zone if end_zone else drop_zone
+    # For picking tasks, prefer end_stop_id over end_zone (end_stop_id is the new standard)
+    # end_stop_id links to a specific stop for CALL,END
+    target_end_zone = None
+    if task_type and str(task_type).lower() == 'picking':
+        # If end_stop_id provided, fetch its zone from stops.csv
+        if end_stop_id:
+            stops = _read_csv(STOPS_CSV)
+            for s in stops:
+                if str(s.get('stop_id')) == str(end_stop_id):
+                    # Store end_stop_id in a way the planner can use to emit CALL,{end_stop_id}
+                    # For now, use end_zone as fallback, but tag it with end_stop_id
+                    target_end_zone = s.get('zone_id') or end_zone or drop_zone
+                    break
+        else:
+            # Fallback to end_zone if end_stop_id not provided
+            target_end_zone = end_zone if end_zone else drop_zone
+    else:
+        # For non-picking tasks, use end_zone or drop_zone
+        target_end_zone = end_zone if end_zone else drop_zone
 
     cmds = generate_path_commands(
         graph=graph,
@@ -421,7 +448,9 @@ def plan_and_write_path(
         selected_racks_by_stop=selected_racks_by_stop,
         drop_zone=drop_zone,  # Keep for backward compatibility
         end_zone=target_end_zone,
+        end_stop_id=end_stop_id,  # Pass end_stop_id to use for CALL,{end_stop_id}
         stop_operations=stop_operations if stop_operations else None,
+        map_id=map_id,  # Pass map_id to filter zone rows correctly
     )
 
     if task_type and str(task_type).lower() == 'charging':
